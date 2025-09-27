@@ -1,7 +1,9 @@
 resource "proxmox_virtual_environment_download_file" "talos" {
+  for_each = { for node in var.proxmox_pve_nodes : node.name => node }
+
   content_type = "iso"
   datastore_id = "local"
-  node_name    = var.proxmox_pve_node_name
+  node_name    = each.value.name
 
   file_name               = "talos-${var.talos_version}-nocloud-amd64.iso"
   url                     = "https://factory.talos.dev/image/${var.talos_disk_image_schematic_id}/${var.talos_version}/nocloud-amd64.raw.zst"
@@ -11,11 +13,12 @@ resource "proxmox_virtual_environment_download_file" "talos" {
 }
 
 resource "proxmox_virtual_environment_vm" "controller" {
-  count           = var.controller_count
-  name            = "talos-${var.cluster_name}-${local.controller_nodes[count.index].name}"
-  node_name       = var.proxmox_pve_node_name
+  for_each = local.controller_nodes
+
+  name            = "talos-${var.cluster_name}-${each.key}"
+  node_name       = each.value.node
   tags            = sort(["terraform", "talos", "control-plane", var.cluster_name])
-  vm_id           = var.cluster_node_network_first_controller_hostnum + count.index
+  vm_id           = each.value.vm_id
   on_boot         = true
   stop_on_destroy = true
   bios            = "ovmf"
@@ -54,7 +57,7 @@ resource "proxmox_virtual_environment_vm" "controller" {
     discard      = "on"
     size         = 64
     file_format  = "raw"
-    file_id      = proxmox_virtual_environment_download_file.talos.id
+    file_id      = proxmox_virtual_environment_download_file.talos[each.value.node].id
   }
   agent {
     enabled = true
@@ -63,7 +66,7 @@ resource "proxmox_virtual_environment_vm" "controller" {
   initialization {
     ip_config {
       ipv4 {
-        address = "${local.controller_nodes[count.index].address}/24"
+        address = "${each.value.address}/24"
         gateway = var.cluster_node_network_gateway
       }
     }
@@ -74,11 +77,12 @@ resource "proxmox_virtual_environment_vm" "controller" {
 }
 
 resource "proxmox_virtual_environment_vm" "worker" {
-  count           = var.worker_count
-  name            = "talos-${var.cluster_name}-${local.worker_nodes[count.index].name}"
-  node_name       = var.proxmox_pve_node_name
+  for_each = local.worker_nodes
+
+  name            = "talos-${var.cluster_name}-${each.key}"
+  node_name       = each.value.node
   tags            = sort(["terraform", "talos", "worker", var.cluster_name])
-  vm_id           = var.cluster_node_network_first_worker_hostnum + count.index
+  vm_id           = each.value.vm_id
   on_boot         = true
   stop_on_destroy = true
   bios            = "ovmf"
@@ -117,7 +121,7 @@ resource "proxmox_virtual_environment_vm" "worker" {
     discard      = "on"
     size         = 128
     file_format  = "raw"
-    file_id      = proxmox_virtual_environment_download_file.talos.id
+    file_id      = proxmox_virtual_environment_download_file.talos[each.value.node].id
   }
   agent {
     enabled = true
@@ -126,7 +130,7 @@ resource "proxmox_virtual_environment_vm" "worker" {
   initialization {
     ip_config {
       ipv4 {
-        address = "${local.worker_nodes[count.index].address}/24"
+        address = "${each.value.address}/24"
         gateway = var.cluster_node_network_gateway
       }
     }

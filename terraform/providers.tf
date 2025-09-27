@@ -14,6 +14,15 @@ terraform {
 provider "proxmox" {
   endpoint = var.proxmox_pve_endpoint
   ssh {
+    dynamic "node" {
+      for_each = var.proxmox_pve_nodes
+
+      content {
+        name    = node.value.name
+        address = node.value.address
+      }
+    }
+
     username = var.proxmox_pve_username
     agent    = true
   }

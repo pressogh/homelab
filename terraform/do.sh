@@ -28,8 +28,10 @@ function apply {
   terraform output -raw talosconfig > output/talosconfig.yml
   terraform output -raw kubeconfig > output/kubeconfig.yml
   health
+  install-gateway-api-crd
   export-kubernetes-internal-ca-crt
   info
+  merge-kubeconfig
 }
 
 function health {
@@ -65,15 +67,59 @@ function info {
   kubectl get nodes -o wide
 }
 
+function install-gateway-api-crd {
+  step 'install gateway api crds'
+  kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.3.0/standard-install.yaml
+}
+
 function export-kubernetes-internal-ca-crt {
   step 'export kubernetes-internal-ca-crt.pem'
-  kubectl get -n cert-manager secret/internal-root-ca -o jsonpath='{.data.tls\.crt}' \
-    | base64 -d \
-    > output/kubernetes-internal-ca-crt.pem
+
+  local max_wait=300
+  local elapsed=0
+  local interval=5
+
+  echo "Waiting for secret/internal-root-ca in cert-manager namespace (max ${max_wait}s)..."
+
+  while [ $elapsed -lt $max_wait ]; do
+    if kubectl get -n cert-manager secret/internal-root-ca &>/dev/null; then
+      echo "Secret found after ${elapsed}s"
+      kubectl get -n cert-manager secret/internal-root-ca -o jsonpath='{.data.tls\.crt}' \
+        | base64 -d \
+        > output/kubernetes-internal-ca-crt.pem
+      echo "Exported to output/kubernetes-internal-ca-crt.pem"
+      return 0
+    fi
+
+    sleep $interval
+    elapsed=$((elapsed + interval))
+    echo "Still waiting... (${elapsed}/${max_wait}s)"
+  done
+
+  echo "Error: secret/internal-root-ca not found after ${max_wait}s"
+  return 1
 }
 
 function destroy {
   terraform destroy -auto-approve
+}
+
+function merge-kubeconfig {
+  step 'merge kubeconfig to ~/.kube/config'
+
+  local controllers="$(terraform output -raw controllers)"
+  local c0="$(echo $controllers | cut -d , -f 1)"
+
+  # 기존 컨텍스트 백업
+  if [ -f "$HOME/.kube/config" ]; then
+    cp "$HOME/.kube/config" "$HOME/.kube/config.backup.$(date +%Y%m%d_%H%M%S)"
+    echo "Backup created"
+  fi
+
+  KUBECONFIG=~/.kube/config talosctl -n $c0 kubeconfig --merge
+
+  echo "Successfully merged kubeconfig"
+  kubectl config get-contexts
 }
 
 case $1 in
@@ -98,6 +144,9 @@ case $1 in
     ;;
   destroy)
     destroy
+    ;;
+  merge-kubeconfig)
+    merge-kubeconfig
     ;;
   *)
     echo $"Usage: $0 {init|plan|apply|plan-apply|health|info}"

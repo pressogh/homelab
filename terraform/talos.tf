@@ -41,11 +41,11 @@ data "talos_machine_configuration" "controller" {
             EOF
           },
           {
-            name = "cilium"
+            name     = "cilium"
             contents = local.cilium_manifest
           },
           {
-            name = "cert-manager"
+            name     = "cert-manager"
             contents = local.cert_manager_manifest
           },
           {
@@ -53,11 +53,11 @@ data "talos_machine_configuration" "controller" {
             contents = local.trust_manager_manifest
           },
           {
-            name = "gateway"
+            name     = "gateway"
             contents = local.gateway_manifest
           },
           {
-            name = "longhorn"
+            name     = "longhorn"
             contents = local.longhorn_manifest
           },
         ],
@@ -89,16 +89,17 @@ data "talos_client_configuration" "talos" {
 resource "talos_machine_configuration_apply" "controller" {
   depends_on = [proxmox_virtual_environment_vm.controller]
 
-  count                       = var.controller_count
+  for_each = local.controller_nodes
+
   client_configuration        = talos_machine_secrets.talos.client_configuration
   machine_configuration_input = data.talos_machine_configuration.controller.machine_configuration
-  endpoint                    = local.controller_nodes[count.index].address
-  node                        = local.controller_nodes[count.index].address
+  endpoint                    = each.value.address
+  node                        = each.value.address
   config_patches = [
     yamlencode({
       machine = {
         network = {
-          hostname = local.controller_nodes[count.index].name
+          hostname = each.key
         }
       }
     }),
@@ -108,16 +109,17 @@ resource "talos_machine_configuration_apply" "controller" {
 resource "talos_machine_configuration_apply" "worker" {
   depends_on = [proxmox_virtual_environment_vm.worker]
 
-  count                       = var.worker_count
+  for_each = local.worker_nodes
+
   client_configuration        = talos_machine_secrets.talos.client_configuration
   machine_configuration_input = data.talos_machine_configuration.worker.machine_configuration
-  endpoint                    = local.worker_nodes[count.index].address
-  node                        = local.worker_nodes[count.index].address
+  endpoint                    = each.value.address
+  node                        = each.value.address
   config_patches = [
     yamlencode({
       machine = {
         network = {
-          hostname = local.worker_nodes[count.index].name
+          hostname = each.key
         }
       }
     }),
@@ -131,8 +133,8 @@ resource "talos_machine_bootstrap" "talos" {
   ]
 
   client_configuration = talos_machine_secrets.talos.client_configuration
-  endpoint             = local.controller_nodes[0].address
-  node                 = local.controller_nodes[0].address
+  endpoint             = values(local.controller_nodes)[0].address
+  node                 = values(local.controller_nodes)[0].address
 }
 
 data "talos_cluster_health" "talos" {
@@ -151,6 +153,6 @@ resource "talos_cluster_kubeconfig" "talos" {
   depends_on = [data.talos_cluster_health.talos]
 
   client_configuration = talos_machine_secrets.talos.client_configuration
-  endpoint             = local.controller_nodes[0].address
-  node                 = local.controller_nodes[0].address
+  endpoint             = values(local.controller_nodes)[0].address
+  node                 = values(local.controller_nodes)[0].address
 }

@@ -1,10 +1,13 @@
-variable "proxmox_pve_node_name" {
-  type        = string
-  description = "The name of the Proxmox node to deploy to."
-}
 variable "proxmox_pve_endpoint" {
   type        = string
   description = "Endpoint for the Proxmox provider."
+}
+variable "proxmox_pve_nodes" {
+  type = set(object({
+    name    = string
+    address = string
+  }))
+  description = "Set of Proxmox nodes with their names and addresses."
 }
 variable "proxmox_pve_username" {
   type        = string
@@ -102,23 +105,19 @@ variable "cluster_node_network_load_balancer_last_hostnum" {
   default     = 250
 }
 
-variable "controller_count" {
-  type        = number
-  default     = 1
-  description = "Number of controller nodes to create."
-  validation {
-    condition     = var.controller_count >= 1
-    error_message = "Must be 1 or more."
-  }
+variable "controllers" {
+  type = list(object({
+    node = string
+  }))
+  default     = []
+  description = "List of controller nodes with their Proxmox node names."
 }
-variable "worker_count" {
-  type        = number
-  default     = 2
-  description = "Number of worker nodes to create."
-  validation {
-    condition     = var.worker_count >= 1
-    error_message = "Must be 1 or more."
-  }
+variable "workers" {
+  type = list(object({
+    node = string
+  }))
+  default     = []
+  description = "List of worker nodes with their Proxmox node names."
 }
 
 variable "cilium_version" {
