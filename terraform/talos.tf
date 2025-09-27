@@ -42,45 +42,24 @@ data "talos_machine_configuration" "controller" {
           },
           {
             name = "cilium"
-            contents = join("---\n", [
-              data.helm_template.cilium.manifest,
-              "# Source cilium.tf\n${local.cilium_external_lb_manifest}",
-            ])
+            contents = local.cilium_manifest
           },
           {
             name = "cert-manager"
-            contents = join("---\n", [
-              yamlencode({
-                apiVersion = "v1"
-                kind       = "Namespace"
-                metadata = {
-                  name = "cert-manager"
-                }
-              }),
-              data.helm_template.cert_manager.manifest,
-              "# Source cert-manager.tf\n${local.cert_manager_cloudflare_manifest}",
-            ])
+            contents = local.cert_manager_manifest
+          },
+          {
+            name     = "trust-manager"
+            contents = local.trust_manager_manifest
           },
           {
             name = "gateway"
-            contents = join("---\n", [
-              yamlencode({
-                apiVersion = "v1"
-                kind       = "Namespace"
-                metadata = {
-                  name = "gateway-public"
-                }
-              }),
-              yamlencode({
-                  apiVersion = "v1"
-                  kind       = "Namespace"
-                  metadata = {
-                  name = "gateway-internal"
-                  }
-              }),
-              "# Source gateway.tf\n${local.gateways_manifest}",
-            ]),
-          }
+            contents = local.gateway_manifest
+          },
+          {
+            name = "longhorn"
+            contents = local.longhorn_manifest
+          },
         ],
       },
     }),

@@ -3,11 +3,11 @@ resource "proxmox_virtual_environment_download_file" "talos" {
   datastore_id = "local"
   node_name    = var.proxmox_pve_node_name
 
-  file_name               = "talos-${var.talos_version}-noclude-amd64.iso"
+  file_name               = "talos-${var.talos_version}-nocloud-amd64.iso"
   url                     = "https://factory.talos.dev/image/${var.talos_disk_image_schematic_id}/${var.talos_version}/nocloud-amd64.raw.zst"
   decompression_algorithm = "zst"
 
-  overwrite = false
+  overwrite = true
 }
 
 resource "proxmox_virtual_environment_vm" "controller" {

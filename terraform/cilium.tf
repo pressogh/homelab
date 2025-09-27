@@ -37,7 +37,15 @@ locals {
       }
     },
   ]
+
   cilium_external_lb_manifest = join("---\n", [for d in local.cilium_external_lb_manifests : yamlencode(d)])
+  cilium_manifest = join(
+    "---\n",
+    [
+      data.helm_template.cilium.manifest,
+      local.cilium_external_lb_manifest,
+    ]
+  )
 }
 
 data "helm_template" "cilium" {

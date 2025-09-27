@@ -152,23 +152,28 @@ variable "internal_domain" {
   type        = string
   description = "The internal domain to use for ACME DNS-01 challenges."
 }
-variable "cf_token_public" {
-  type        = string
-  description = "The Cloudflare API token to use for DNS-01 challenges."
-  sensitive   = true
-}
-variable "cf_token_internal" {
+variable "cf_api_token" {
   type        = string
   description = "The Cloudflare API token to use for DNS-01 challenges."
   sensitive   = true
 }
 variable "public_gw_secret_name" {
-  type = string
+  type        = string
   description = "The public gateway secret name."
-  default = "public-gw-tls"
+  default     = "public-gw-tls"
 }
 variable "internal_gw_secret_name" {
-  type = string
+  type        = string
   description = "The internal gateway secret name."
-  default = "internal-gw-tls"
+  default     = "internal-gw-tls"
+}
+
+variable "longhorn_version" {
+  type        = string
+  default     = "1.10.0"
+  description = "The version of Longhorn to use."
+  validation {
+    condition     = can(regex("^\\d+(\\.\\d+)+", var.longhorn_version))
+    error_message = "Must be a version number."
+  }
 }
