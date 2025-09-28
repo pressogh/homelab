@@ -6,7 +6,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/presso/homelab.git
+    repoURL: https://github.com/pressogh/homelab.git
     path: k8s-manifests/test
     targetRevision: HEAD
   destination:
@@ -18,3 +18,4 @@ spec:
       selfHeal: true
     syncOptions:
     - CreateNamespace=true
+    - ServerSideApply=true
