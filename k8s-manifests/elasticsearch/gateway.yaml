@@ -11,9 +11,9 @@ spec:
     - elasticsearch.home.arpa
   rules:
     - matches:
-      path:
-        type: PathPrefix
-        value: /
+        - path:
+          type: PathPrefix
+          value: /
       backendRefs:
         - name: elasticsearch-master
           port: 9200
