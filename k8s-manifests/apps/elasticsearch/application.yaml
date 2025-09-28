@@ -7,7 +7,7 @@ spec:
   project: default
   sources:
     - repoURL: https://charts.bitnami.com/bitnami
-      chart: bitnami/elasticsearch
+      chart: elasticsearch
       targetRevision: "22.1.6"
       helm:
         valueFiles:
