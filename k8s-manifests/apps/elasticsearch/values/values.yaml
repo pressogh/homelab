@@ -14,7 +14,7 @@ master:
       memory: 8Gi
   persistence:
     enabled: true
-    size: 50Gi
+    size: 10Gi
 
 data:
   replicaCount: 0
