@@ -6,7 +6,7 @@ metadata:
 spec:
   parentRefs:
     - name: internal-gw
-  namespace: gateway-internal
+      namespace: gateway-internal
   hostnames:
     - elasticsearch.home.arpa
   rules:
