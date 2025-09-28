@@ -8,6 +8,7 @@ locals {
       }
       spec = {
         loadBalancerIPs = true
+        externalIPs     = true
         interfaces = [
           "eth0",
         ]
@@ -49,13 +50,16 @@ locals {
 }
 
 data "helm_template" "cilium" {
+
   namespace    = "kube-system"
   name         = "cilium"
   repository   = "https://helm.cilium.io"
   chart        = "cilium"
   version      = var.cilium_version
   kube_version = var.kubernetes_version
-  api_versions = []
+  api_versions = [
+    "gateway.networking.k8s.io/v1/GatewayClass"
+  ]
   set = [
     {
       name  = "ipam.mode"

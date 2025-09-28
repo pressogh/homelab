@@ -69,7 +69,7 @@ function info {
 
 function install-gateway-api-crd {
   step 'install gateway api crds'
-  kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.3.0/standard-install.yaml
+  kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.3.0/experimental-install.yaml
 }
 
 function export-kubernetes-internal-ca-crt {

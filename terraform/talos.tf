@@ -60,6 +60,10 @@ data "talos_machine_configuration" "controller" {
             name     = "longhorn"
             contents = local.longhorn_manifest
           },
+          {
+            name     = "argocd"
+            contents = local.argocd_manifest
+          }
         ],
       },
     }),

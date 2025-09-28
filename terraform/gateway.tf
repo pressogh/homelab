@@ -34,7 +34,13 @@ locals {
     }
     spec = {
       gatewayClassName = "cilium"
-
+      addresses = [
+        {
+          type = "IPAddress"
+          # TODO: Make this configurable
+          value = "192.168.110.220"
+        }
+      ]
       listeners = [
         {
           name     = "http"
@@ -120,7 +126,13 @@ locals {
     }
     spec = {
       gatewayClassName = "cilium"
-
+      addresses = [
+        {
+          type = "IPAddress"
+          # TODO: Make this configurable
+          value = "192.168.110.221"
+        }
+      ]
       listeners = [
         {
           name     = "https-apex"

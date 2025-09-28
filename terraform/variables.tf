@@ -176,3 +176,13 @@ variable "longhorn_version" {
     error_message = "Must be a version number."
   }
 }
+
+variable "argocd_version" {
+  type        = string
+  default     = "8.5.7"
+  description = "The version of Argo CD to use."
+  validation {
+    condition     = can(regex("^\\d+(\\.\\d+)+", var.argocd_version))
+    error_message = "Must be a version number."
+  }
+}
