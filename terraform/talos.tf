@@ -102,9 +102,6 @@ resource "talos_machine_configuration_apply" "controller" {
   config_patches = [
     yamlencode({
       machine = {
-        sysctls = {
-          "vm.max_map_count" = 262144
-        }
         network = {
           hostname = each.key
         }
@@ -125,6 +122,9 @@ resource "talos_machine_configuration_apply" "worker" {
   config_patches = [
     yamlencode({
       machine = {
+        sysctls = {
+          "vm.max_map_count" = 262144
+        }
         network = {
           hostname = each.key
         }
