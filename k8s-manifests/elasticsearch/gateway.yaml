@@ -12,8 +12,8 @@ spec:
   rules:
     - matches:
         - path:
-          type: PathPrefix
-          value: /
+            type: PathPrefix
+            value: /
       backendRefs:
         - name: elasticsearch-master
           port: 9200
