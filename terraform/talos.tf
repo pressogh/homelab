@@ -124,6 +124,27 @@ resource "talos_machine_configuration_apply" "worker" {
       machine = {
         sysctls = {
           "vm.max_map_count" = 262144
+          "vm.nr_hugepages" = 1024
+        }
+        kernel = {
+          modules = [
+            { name = "nvme_tcp" },
+            { name = "vfio_pci" }
+          ]
+        }
+        kubelet = {
+          extraMounts = [
+            {
+              destination = "/var/lib/longhorn"
+              type        = "bind"
+              source      = "/var/lib/longhorn"
+              options = [
+                "bind",
+                "rshared",
+                "rw"
+              ]
+            }
+          ]
         }
         network = {
           hostname = each.key
