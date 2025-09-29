@@ -151,21 +151,6 @@ locals {
       ]
       listeners = [
         {
-          name     = "elasticsearch-tcp"
-          port     = 9200
-          protocol = "TCP"
-          allowedRoutes = {
-            namespaces = {
-              from = "Selector"
-              selector = {
-                matchLabels = {
-                  expose = "internal"
-                }
-              }
-            }
-          }
-        },
-        {
           name     = "http-apex"
           hostname = var.internal_domain
           port     = 80
