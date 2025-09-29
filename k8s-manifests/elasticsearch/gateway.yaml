@@ -15,5 +15,5 @@ spec:
             type: PathPrefix
             value: /
       backendRefs:
-        - name: elasticsearch-master
+        - name: elasticsearch
           port: 9200
