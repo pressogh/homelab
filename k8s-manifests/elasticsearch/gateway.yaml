@@ -1,19 +1,13 @@
 apiVersion: gateway.networking.k8s.io/v1
-kind: HTTPRoute
+kind: TCPRoute
 metadata:
-  name: elasticsearch-route
+  name: elasticsearch-tcproute
   namespace: elastic-system
 spec:
   parentRefs:
     - name: internal-gw
       namespace: gateway-internal
-  hostnames:
-    - elasticsearch.home.arpa
   rules:
-    - matches:
-        - path:
-            type: PathPrefix
-            value: /
-      backendRefs:
-        - name: elasticsearch
-          port: 9200
+    - backendRefs:
+      - name: elasticsearch
+        port: 9200

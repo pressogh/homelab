@@ -43,8 +43,24 @@ locals {
       ]
       listeners = [
         {
-          name     = "http"
+          name     = "http-apex"
           hostname = var.public_domain
+          port     = 80
+          protocol = "HTTP"
+          allowedRoutes = {
+            namespaces = {
+              from = "Selector"
+              selector = {
+                matchLabels = {
+                  expose = "public"
+                }
+              }
+            }
+          }
+        },
+        {
+          name     = "http-wild"
+          hostname = "*.${var.public_domain}"
           port     = 80
           protocol = "HTTP"
           allowedRoutes = {
@@ -134,6 +150,53 @@ locals {
         }
       ]
       listeners = [
+        {
+          name     = "elasticsearch-tcp"
+          port     = 9200
+          protocol = "TCP"
+          allowedRoutes = {
+            namespaces = {
+              from = "Selector"
+              selector = {
+                matchLabels = {
+                  expose = "internal"
+                }
+              }
+            }
+          }
+        },
+        {
+          name     = "http-apex"
+          hostname = var.internal_domain
+          port     = 80
+          protocol = "HTTP"
+          allowedRoutes = {
+            namespaces = {
+              from = "Selector"
+              selector = {
+                matchLabels = {
+                  expose = "internal"
+                }
+              }
+            }
+          }
+        },
+        {
+          name     = "http-wild"
+          hostname = "*.${var.internal_domain}"
+          port     = 80
+          protocol = "HTTP"
+          allowedRoutes = {
+            namespaces = {
+              from = "Selector"
+              selector = {
+                matchLabels = {
+                  expose = "internal"
+                }
+              }
+            }
+          }
+        },
         {
           name     = "https-apex"
           hostname = var.internal_domain
