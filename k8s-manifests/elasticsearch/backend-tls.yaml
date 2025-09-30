@@ -1,0 +1,16 @@
+apiVersion: policy.networking.k8s.io/v1alpha2
+kind: BackendTLSPolicy
+metadata:
+  name: elasticsearch-backend-tls
+  namespace: elastic-system
+spec:
+  targetRefs:
+    - group: ""
+      kind: Service
+      name: elasticsearch-es-http
+  tls:
+    hostname: elasticsearch-es-http.elastic-system.svc.cluster.local
+    caCertificateRefs:
+      - group: ""
+        kind: Secret
+        name: elasticsearch-es-http-ca-internal
