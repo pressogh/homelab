@@ -6,20 +6,14 @@ metadata:
 spec:
   project: default
   sources:
-    - repoURL: https://charts.bitnami.com/bitnami
-      chart: elasticsearch
-      targetRevision: "22.1.6"
-      helm:
-        valueFiles:
-          - $values/k8s-manifests/apps/elasticsearch/values/values.yaml
-    - repoURL: https://github.com/pressogh/homelab.git
-      targetRevision: main
-      ref: values
+    - repoURL: https://helm.elastic.co
+      chart: eck-operator
+      targetRevision: latest
     - repoURL: https://github.com/pressogh/homelab.git
       targetRevision: main
       path: k8s-manifests/elasticsearch
   destination:
-    server: "https://kubernetes.default.svc"
+    server: https://kubernetes.default.svc
     namespace: elastic-system
   syncPolicy:
     automated:
