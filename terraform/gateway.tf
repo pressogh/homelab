@@ -182,6 +182,7 @@ locals {
             }
           }
         },
+
         {
           name     = "https-apex"
           hostname = var.internal_domain
@@ -218,6 +219,26 @@ locals {
                 name = var.internal_gw_secret_name
               }
             ]
+          }
+          allowedRoutes = {
+            namespaces = {
+              from = "Selector"
+              selector = {
+                matchLabels = {
+                  expose = "internal"
+                }
+              }
+            }
+          }
+        },
+
+        {
+          name     = "es-tls"
+          hostname = "elasticsearch.home.arpa"
+          port     = 9200
+          protocol = "TLS"
+          tls = {
+            mode = "Passthrough"
           }
           allowedRoutes = {
             namespaces = {
