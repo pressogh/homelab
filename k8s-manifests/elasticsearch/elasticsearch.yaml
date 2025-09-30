@@ -7,7 +7,7 @@ spec:
   version: 8.19.4
   nodeSets:
   - name: masters
-    count: 3
+    count: 2
     config:
       node.roles: ["master"]
       node.store.allow_mmap: false
@@ -35,8 +35,37 @@ spec:
           - name: ES_JAVA_OPTS
             value: "-Xms1g -Xmx1g"
 
+  - name: data-master
+    count: 1
+    config:
+      node.roles: ["master", "data", "ingest"]
+      node.store.allow_mmap: false
+    volumeClaimTemplates:
+    - metadata:
+        name: elasticsearch-data
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 50Gi
+        storageClassName: longhorn
+    podTemplate:
+      spec:
+        containers:
+        - name: elasticsearch
+          resources:
+            requests:
+              cpu: "2"
+              memory: 4Gi
+            limits:
+              cpu: "4"
+              memory: 8Gi
+          env:
+          - name: ES_JAVA_OPTS
+            value: "-Xms2g -Xmx2g"
+
   - name: data
-    count: 2
+    count: 1
     config:
       node.roles: ["data", "ingest"]
       node.store.allow_mmap: false
