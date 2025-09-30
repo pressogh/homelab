@@ -7,7 +7,7 @@ spec:
   parentRefs:
     - name: internal-gw
       namespace: gateway-internal
-      sectionName: http-wild
+      sectionName: https-wild
   hostnames:
     - elasticsearch.home.arpa
   rules:
