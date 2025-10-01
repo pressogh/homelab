@@ -235,7 +235,7 @@ locals {
         {
           name     = "es-tls"
           hostname = "elasticsearch.home.arpa"
-          port     = 443
+          port     = 9200
           protocol = "TLS"
           tls = {
             mode = "Passthrough"
