@@ -1,0 +1,21 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: es-cert
+  namespace: elastic-system
+spec:
+  subject:
+    organizations:
+      - home.arpa
+    organizationalUnits:
+      - Kubernetes
+  commonName: elasticsearch
+  dnsNames:
+    - es.home.arpa
+  privateKey:
+    algorithm: ECDSA
+    size: 256
+  secretName: es-tls
+  issuerRef:
+      kind: ClusterIssuer
+      name: internal-selfsigned
