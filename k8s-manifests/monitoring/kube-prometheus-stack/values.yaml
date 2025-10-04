@@ -164,15 +164,6 @@ prometheusOperator:
     enabled: true
     failurePolicy: ""
     timeoutSeconds: 10
-    deployment:
-      enabled: true
-    patch:
-      enabled: true
-      image:
-        registry: registry.k8s.io
-        repository: ingress-nginx/kube-webhook-certgen
-        tag: v1.6.3
-      ttlSecondsAfterFinished: 60
 
   namespaces: {}
   denyNamespaces: []
