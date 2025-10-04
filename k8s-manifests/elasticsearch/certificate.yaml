@@ -13,8 +13,8 @@ spec:
   dnsNames:
     - es.home.arpa
   privateKey:
-    algorithm: ECDSA
-    size: 256
+    algorithm: RSA
+    size: 4096
   secretName: es-tls
   issuerRef:
       kind: ClusterIssuer
