@@ -352,89 +352,107 @@ extraManifests:
               port: 80
 
   - |
-    apiVersion: networking.k8s.io/v1
-    kind: NetworkPolicy
+    apiVersion: cilium.io/v2
+    kind: CiliumNetworkPolicy
     metadata:
       name: allow-same-namespace
       namespace: {{ .Release.Namespace }}
+      annotations:
+        helm.sh/hook: pre-install,pre-upgrade
+        helm.sh/hook-weight: "-15"
+        helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
     spec:
-      podSelector: {}
-      policyTypes: ["Ingress"]
+      endpointSelector: {}
       ingress:
-        - from:
-            - podSelector: {}
+        - fromEndpoints:
+            - matchLabels:
+                k8s:io.kubernetes.pod.namespace: {{ .Release.Namespace }}
 
   - |
-    apiVersion: networking.k8s.io/v1
-    kind: NetworkPolicy
+    apiVersion: cilium.io/v2
+    kind: CiliumNetworkPolicy
     metadata:
       name: allow-all-egress
       namespace: {{ .Release.Namespace }}
+      annotations:
+        helm.sh/hook: pre-install,pre-upgrade
+        helm.sh/hook-weight: "-20"
+        helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
     spec:
-      podSelector: {}
-      policyTypes: ["Egress"]
+      endpointSelector: {}
       egress:
-        - {}
+        - toCIDR:
+            - "0.0.0.0/0"
+            - "::/0"
 
   - |
-    apiVersion: networking.k8s.io/v1
-    kind: NetworkPolicy
+    apiVersion: cilium.io/v2
+    kind: CiliumNetworkPolicy
     metadata:
       name: grafana-allow-from-gateway
       namespace: {{ .Release.Namespace }}
+      annotations:
+        helm.sh/hook: pre-install,pre-upgrade
+        helm.sh/hook-weight: "-5"
+        helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
     spec:
-      podSelector:
+      endpointSelector:
         matchLabels:
           app.kubernetes.io/name: grafana
-      policyTypes: ["Ingress"]
       ingress:
-        - from:
-            - namespaceSelector:
-                matchLabels:
-                  kubernetes.io/metadata.name: gateway-internal
-          ports:
-            - port: 3000
-              protocol: TCP
+        - fromEndpoints:
+            - matchLabels:
+                k8s:io.kubernetes.pod.namespace: gateway-internal
+          toPorts:
+            - ports:
+                - port: "3000"
+                  protocol: TCP
 
   - |
-    apiVersion: networking.k8s.io/v1
-    kind: NetworkPolicy
+    apiVersion: cilium.io/v2
+    kind: CiliumNetworkPolicy
     metadata:
       name: prometheus-allow-from-gateway
       namespace: {{ .Release.Namespace }}
+      annotations:
+        helm.sh/hook: pre-install,pre-upgrade
+        helm.sh/hook-weight: "-5"
+        helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
     spec:
-      podSelector:
+      endpointSelector:
         matchLabels:
           app.kubernetes.io/name: prometheus
-      policyTypes: ["Ingress"]
       ingress:
-        - from:
-            - namespaceSelector:
-                matchLabels:
-                  kubernetes.io/metadata.name: gateway-internal
-          ports:
-            - port: 9090
-              protocol: TCP
+        - fromEndpoints:
+            - matchLabels:
+                k8s:io.kubernetes.pod.namespace: gateway-internal
+          toPorts:
+            - ports:
+                - port: "9090"
+                  protocol: TCP
 
   - |
-    apiVersion: networking.k8s.io/v1
-    kind: NetworkPolicy
+    apiVersion: cilium.io/v2
+    kind: CiliumNetworkPolicy
     metadata:
       name: alertmanager-allow-from-gateway
       namespace: {{ .Release.Namespace }}
+      annotations:
+        helm.sh/hook: pre-install,pre-upgrade
+        helm.sh/hook-weight: "-5"
+        helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
     spec:
-      podSelector:
+      endpointSelector:
         matchLabels:
           app.kubernetes.io/name: alertmanager
-      policyTypes: ["Ingress"]
       ingress:
-        - from:
-            - namespaceSelector:
-                matchLabels:
-                  kubernetes.io/metadata.name: gateway-internal
-          ports:
-            - port: 9093
-              protocol: TCP
+        - fromEndpoints:
+            - matchLabels:
+                k8s:io.kubernetes.pod.namespace: gateway-internal
+          toPorts:
+            - ports:
+                - port: "9093"
+                  protocol: TCP
 
   - |
     apiVersion: cilium.io/v2
@@ -442,6 +460,10 @@ extraManifests:
     metadata:
       name: operator-webhook-allow-from-apiserver
       namespace: {{ .Release.Namespace }}
+      annotations:
+        helm.sh/hook: pre-install,pre-upgrade
+        helm.sh/hook-weight: "-10"
+        helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
     spec:
       endpointSelector:
         matchLabels:
