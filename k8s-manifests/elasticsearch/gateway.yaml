@@ -7,7 +7,6 @@ spec:
   parentRefs:
     - name: internal-gw
       namespace: gateway-internal
-      sectionName: es-tls
   hostnames:
     - es.home.arpa
   rules:

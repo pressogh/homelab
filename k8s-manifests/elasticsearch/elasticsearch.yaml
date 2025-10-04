@@ -7,8 +7,8 @@ spec:
   version: 8.19.4
   http:
     tls:
-      certificate:
-        secretName: es-tls
+      selfSignedCertificate:
+        disabled: true
   nodeSets:
   - name: masters
     count: 2
