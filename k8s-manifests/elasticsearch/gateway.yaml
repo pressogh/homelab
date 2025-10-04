@@ -7,10 +7,10 @@ metadata:
     gateway.cilium.io/backend-protocol: "https"
 spec:
   parentRefs:
-    - name: public-gw
-      namespace: gateway-public
+    - name: internal-gw
+      namespace: gateway-internal
   hostnames:
-    - elasticsearch.presso.ac
+    - es.home.arpa
   rules:
     - backendRefs:
       - name: elasticsearch-es-http
