@@ -84,16 +84,6 @@ variable "cluster_node_network_vlan_id" {
   description = "The VLAN ID of the cluster node network"
   default     = 110
 }
-variable "cluster_node_network_first_controller_hostnum" {
-  type        = number
-  description = "The hostnum of the first controller host"
-  default     = 100
-}
-variable "cluster_node_network_first_worker_hostnum" {
-  type        = number
-  description = "The hostnum of the first worker host"
-  default     = 110
-}
 variable "cluster_node_network_load_balancer_first_hostnum" {
   type        = number
   description = "The hostnum of the first load balancer host"
@@ -107,17 +97,19 @@ variable "cluster_node_network_load_balancer_last_hostnum" {
 
 variable "controllers" {
   type = list(object({
+    vm_id = number
     node = string
   }))
   default     = []
-  description = "List of controller nodes with their Proxmox node names."
+  description = "List of controller nodes with their Proxmox node names and VM ID."
 }
 variable "workers" {
   type = list(object({
+    vm_id = number
     node = string
   }))
   default     = []
-  description = "List of worker nodes with their Proxmox node names."
+  description = "List of worker nodes with their Proxmox node names and VM ID."
 }
 
 variable "cilium_version" {

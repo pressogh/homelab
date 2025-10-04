@@ -32,6 +32,7 @@ function apply {
   export-kubernetes-internal-ca-crt
   info
   merge-kubeconfig
+  restart-cilium-operator
 }
 
 function health {
@@ -70,6 +71,11 @@ function info {
 function install-gateway-api-crd {
   step 'install gateway api crds'
   kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.3.0/experimental-install.yaml
+}
+
+function restart-cilium-operator {
+  step 'restart cilium operator'
+  kubectl rollout restart deployment/cilium-operator -n kube-system
 }
 
 function export-kubernetes-internal-ca-crt {
