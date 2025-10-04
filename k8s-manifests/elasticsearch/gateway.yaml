@@ -1,5 +1,5 @@
-apiVersion: gateway.networking.k8s.io/v1
-kind: HTTPRoute
+apiVersion: gateway.networking.k8s.io/v1alhpa2
+kind: TLSRoute
 metadata:
   name: elasticsearch-route
   namespace: elastic-system
@@ -9,6 +9,7 @@ spec:
   parentRefs:
     - name: internal-gw
       namespace: gateway-internal
+      sectionName: es-tls
   hostnames:
     - es.home.arpa
   rules:
