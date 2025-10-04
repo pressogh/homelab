@@ -306,7 +306,8 @@ thanosRuler:
 cleanPrometheusOperatorObjectNames: false
 
 extraManifests:
-  - apiVersion: gateway.networking.k8s.io/v1
+  - |
+    apiVersion: gateway.networking.k8s.io/v1
     kind: HTTPRoute
     metadata:
       name: grafana
@@ -338,7 +339,8 @@ extraManifests:
             - name: {{ include "kube-prometheus-stack.grafana.fullname" . }}
               port: 80
 
-  - apiVersion: networking.k8s.io/v1
+  - |
+    apiVersion: networking.k8s.io/v1
     kind: NetworkPolicy
     metadata:
       name: default-deny-ingress
@@ -347,7 +349,8 @@ extraManifests:
       podSelector: {}
       policyTypes: ["Ingress"]
 
-  - apiVersion: networking.k8s.io/v1
+  - |
+    apiVersion: networking.k8s.io/v1
     kind: NetworkPolicy
     metadata:
       name: allow-dns-egress
@@ -369,7 +372,8 @@ extraManifests:
             - protocol: TCP
               port: 53
 
-  - apiVersion: networking.k8s.io/v1
+  - |
+    apiVersion: networking.k8s.io/v1
     kind: NetworkPolicy
     metadata:
       name: grafana-allow-from-gateway
@@ -388,7 +392,8 @@ extraManifests:
             - port: 80
               protocol: TCP
 
-  - apiVersion: networking.k8s.io/v1
+  - |
+    apiVersion: networking.k8s.io/v1
     kind: NetworkPolicy
     metadata:
       name: prometheus-allow-from-gateway
@@ -407,7 +412,8 @@ extraManifests:
             - port: 9090
               protocol: TCP
 
-  - apiVersion: networking.k8s.io/v1
+  - |
+    apiVersion: networking.k8s.io/v1
     kind: NetworkPolicy
     metadata:
       name: alertmanager-allow-from-gateway
