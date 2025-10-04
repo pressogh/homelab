@@ -331,16 +331,37 @@ extraManifests:
     spec:
       endpointSelector: {}
       egress:
-        - toEntities:
-            - kube-apiserver
+        - toServices:
+            - k8sService:
+                namespace: default
+                serviceName: kubernetes
           toPorts:
             - ports:
                 - port: "443"
                   protocol: TCP
+    
+        - toCIDR:
+            - 10.96.0.1/32
+          toPorts:
+            - ports:
+                - port: "443"
+                  protocol: TCP
+    
         - toEndpoints:
             - matchLabels:
                 k8s:io.kubernetes.pod.namespace: kube-system
                 k8s:k8s-app: kube-dns
+          toPorts:
+            - ports:
+                - port: "53"
+                  protocol: UDP
+                - port: "53"
+                  protocol: TCP
+    
+        - toEndpoints:
+            - matchLabels:
+                k8s:io.kubernetes.pod.namespace: kube-system
+                k8s:k8s-app: coredns
           toPorts:
             - ports:
                 - port: "53"
