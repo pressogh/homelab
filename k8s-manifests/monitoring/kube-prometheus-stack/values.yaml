@@ -180,6 +180,10 @@ prometheusOperator:
   networkPolicy:
     enabled: true
     flavor: cilium
+    cilium:
+      endpointSelector: {}
+      egress: []
+      ingress: []
 
   serviceAccount:
     create: true
@@ -251,6 +255,10 @@ prometheus:
   networkPolicy:
     enabled: true
     flavor: cilium
+    cilium:
+      endpointSelector: {}
+      egress: []
+      ingress: []
 
   prometheusSpec:
     image:
