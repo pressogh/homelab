@@ -367,7 +367,8 @@ extraManifests:
                   protocol: UDP
                 - port: "53"
                   protocol: TCP
-
+                - port: "9153"
+                  protocol: TCP
   - |
     apiVersion: cilium.io/v2
     kind: CiliumNetworkPolicy
@@ -398,6 +399,8 @@ extraManifests:
                 - port: "53"
                   protocol: UDP
                 - port: "53"
+                  protocol: TCP
+                - port: "9153"
                   protocol: TCP
         - toEntities:
             - remote-node
@@ -433,7 +436,34 @@ extraManifests:
             - ports:
                 - port: "443"
                   protocol: TCP
-
+        - toEndpoints:
+            - matchLabels:
+                k8s:io.kubernetes.pod.namespace: {{ .Release.Namespace }}
+                app.kubernetes.io/name: kube-state-metrics
+          toPorts:
+            - ports:
+                - port: "8080"
+                  protocol: TCP
+        - toEndpoints:
+            - matchLabels:
+                k8s:io.kubernetes.pod.namespace: {{ .Release.Namespace }}
+                app.kubernetes.io/name: alertmanager
+          toPorts:
+            - ports:
+                - port: "9093"
+                  protocol: TCP
+                - port: "8080"
+                  protocol: TCP
+        - toEndpoints:
+            - matchLabels:
+                k8s:io.kubernetes.pod.namespace: {{ .Release.Namespace }}
+                app.kubernetes.io/name: prometheus
+          toPorts:
+            - ports:
+                - port: "9090"
+                  protocol: TCP
+                - port: "8080"
+                  protocol: TCP
   - |
     apiVersion: networking.k8s.io/v1
     kind: NetworkPolicy
@@ -453,7 +483,27 @@ extraManifests:
           ports:
             - port: 9090
               protocol: TCP
-
+            - port: 8080
+              protocol: TCP
+  - |
+    apiVersion: networking.k8s.io/v1
+    kind: NetworkPolicy
+    metadata:
+      name: prometheus-allow-from-gateway
+      namespace: {{ .Release.Namespace }}
+    spec:
+      podSelector:
+        matchLabels:
+          app.kubernetes.io/name: prometheus
+      policyTypes: ["Ingress"]
+      ingress:
+        - from:
+            - namespaceSelector:
+                matchLabels:
+                  kubernetes.io/metadata.name: gateway-internal
+          ports:
+            - port: 9090
+              protocol: TCP
   - |
     apiVersion: networking.k8s.io/v1
     kind: NetworkPolicy
@@ -473,7 +523,6 @@ extraManifests:
           ports:
             - port: 3000
               protocol: TCP
-
   - |
     apiVersion: networking.k8s.io/v1
     kind: NetworkPolicy
@@ -493,7 +542,6 @@ extraManifests:
           ports:
             - port: 9093
               protocol: TCP
-
   - |
     apiVersion: cilium.io/v2
     kind: CiliumNetworkPolicy
@@ -513,7 +561,6 @@ extraManifests:
             - ports:
                 - port: "9094"
                   protocol: TCP
-
   - |
     apiVersion: networking.k8s.io/v1
     kind: NetworkPolicy
@@ -533,7 +580,6 @@ extraManifests:
           ports:
             - port: 8080
               protocol: TCP
-
   - |
     apiVersion: cilium.io/v2
     kind: CiliumNetworkPolicy
@@ -553,7 +599,6 @@ extraManifests:
                   protocol: TCP
                 - port: "443"
                   protocol: TCP
-
   - |
     apiVersion: cilium.io/v2
     kind: CiliumNetworkPolicy
@@ -573,7 +618,6 @@ extraManifests:
                   protocol: TCP
                 - port: "443"
                   protocol: TCP
-
   - |
     apiVersion: cilium.io/v2
     kind: CiliumNetworkPolicy
