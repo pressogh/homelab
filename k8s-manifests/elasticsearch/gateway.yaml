@@ -5,11 +5,10 @@ metadata:
   namespace: elastic-system
 spec:
   parentRefs:
-    - name: internal-gw
-      namespace: gateway-internal
-      sectionName: es-tls
+    - name: public-gw
+      namespace: gateway-public
   hostnames:
-    - elasticsearch.home.arpa
+    - elasticsearch.presso.ac
   rules:
     - backendRefs:
       - name: elasticsearch-es-http

@@ -231,26 +231,6 @@ locals {
             }
           }
         },
-
-        {
-          name     = "es-tls"
-          hostname = "elasticsearch.home.arpa"
-          port     = 9200
-          protocol = "TLS"
-          tls = {
-            mode = "Passthrough"
-          }
-          allowedRoutes = {
-            namespaces = {
-              from = "Selector"
-              selector = {
-                matchLabels = {
-                  expose = "internal"
-                }
-              }
-            }
-          }
-        }
       ]
     }
   })
