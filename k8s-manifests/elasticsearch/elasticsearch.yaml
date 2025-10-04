@@ -5,6 +5,9 @@ metadata:
   namespace: elastic-system
 spec:
   version: 8.19.4
+  tls:
+    selfSignedCertificate:
+      disabled: true
   nodeSets:
   - name: masters
     count: 2
