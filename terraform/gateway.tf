@@ -231,6 +231,31 @@ locals {
             }
           }
         },
+
+        {
+          name     = "es-https-apex"
+          hostname = "es.${var.internal_domain}"
+          port     = 9200
+          protocol = "HTTPS"
+          tls = {
+            mode = "Terminate"
+            certificateRefs = [
+              {
+                name = var.internal_gw_secret_name
+              }
+            ]
+          }
+          allowedRoutes = {
+            namespaces = {
+              from = "Selector"
+              selector = {
+                matchLabels = {
+                  expose = "internal"
+                }
+              }
+            }
+          }
+        },
       ]
     }
   })
