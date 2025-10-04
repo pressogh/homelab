@@ -182,8 +182,10 @@ prometheusOperator:
     flavor: cilium
     cilium:
       endpointSelector: {}
-      egress: []
-      ingress: []
+      egress:
+        - {}
+      ingress:
+        - {}
 
   serviceAccount:
     create: true
@@ -257,8 +259,10 @@ prometheus:
     flavor: cilium
     cilium:
       endpointSelector: {}
-      egress: []
-      ingress: []
+      egress:
+        - {}
+      ingress:
+        - {}
 
   prometheusSpec:
     image:
