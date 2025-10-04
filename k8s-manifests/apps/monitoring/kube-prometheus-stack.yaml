@@ -23,8 +23,8 @@ spec:
       prune: true
       selfHeal: true
     syncOptions:
-    - ServerSideApply=true
-    - CreateNamespace=true
-  managedNamespaceMetadata:
-    labels:
-      expose: internal
+      - ServerSideApply=true
+      - CreateNamespace=true
+    managedNamespaceMetadata:
+      labels:
+        expose: internal
