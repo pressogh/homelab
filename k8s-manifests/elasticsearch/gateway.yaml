@@ -11,10 +11,6 @@ spec:
   hostnames:
     - es.home.arpa
   rules:
-    - matches:
-      - path:
-        type: PathPrefix
-        value: /
     - backendRefs:
       - name: elasticsearch-es-http
         port: 9200
