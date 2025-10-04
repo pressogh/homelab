@@ -355,35 +355,86 @@ extraManifests:
     apiVersion: cilium.io/v2
     kind: CiliumNetworkPolicy
     metadata:
-      name: allow-same-namespace
+      name: allow-egress-core
       namespace: {{ .Release.Namespace }}
       annotations:
         helm.sh/hook: pre-install,pre-upgrade
-        helm.sh/hook-weight: "-15"
+        helm.sh/hook-weight: "-30"
         helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
     spec:
       endpointSelector: {}
-      ingress:
-        - fromEndpoints:
+      egress:
+        - toEntities:
+            - kube-apiserver
+          toPorts:
+            - ports:
+                - port: "443"
+                  protocol: TCP
+                - port: "6443"
+                  protocol: TCP
+        - toServices:
+            - k8sService:
+                namespace: default
+                serviceName: kubernetes
+          toPorts:
+            - ports:
+                - port: "443"
+                  protocol: TCP
+        - toEndpoints:
             - matchLabels:
-                k8s:io.kubernetes.pod.namespace: {{ .Release.Namespace }}
+                k8s:io.kubernetes.pod.namespace: kube-system
+                k8s:k8s-app: kube-dns
+          toPorts:
+            - ports:
+                - port: "53"
+                  protocol: UDP
+                - port: "53"
+                  protocol: TCP
+                - port: "9153"
+                  protocol: TCP
+        - toEndpoints:
+            - matchLabels:
+                k8s:io.kubernetes.pod.namespace: kube-system
+                k8s:k8s-app: coredns
+          toPorts:
+            - ports:
+                - port: "53"
+                  protocol: UDP
+                - port: "53"
+                  protocol: TCP
+                - port: "9153"
+                  protocol: TCP
+        - toEntities:
+            - host
+            - remote-node
+          toPorts:
+            - ports:
+                - port: "10250"
+                  protocol: TCP
+                - port: "9100"
+                  protocol: TCP
 
   - |
     apiVersion: cilium.io/v2
     kind: CiliumNetworkPolicy
     metadata:
-      name: allow-all-egress
+      name: operator-webhook-allow-from-apiserver
       namespace: {{ .Release.Namespace }}
       annotations:
         helm.sh/hook: pre-install,pre-upgrade
         helm.sh/hook-weight: "-20"
         helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
     spec:
-      endpointSelector: {}
-      egress:
-        - toCIDR:
-            - "0.0.0.0/0"
-            - "::/0"
+      endpointSelector:
+        matchLabels:
+          app.kubernetes.io/component: prometheus-operator-webhook
+      ingress:
+        - fromEntities:
+            - kube-apiserver
+          toPorts:
+            - ports:
+                - port: "443"
+                  protocol: TCP
 
   - |
     apiVersion: cilium.io/v2
@@ -393,7 +444,7 @@ extraManifests:
       namespace: {{ .Release.Namespace }}
       annotations:
         helm.sh/hook: pre-install,pre-upgrade
-        helm.sh/hook-weight: "-5"
+        helm.sh/hook-weight: "-10"
         helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
     spec:
       endpointSelector:
@@ -416,7 +467,7 @@ extraManifests:
       namespace: {{ .Release.Namespace }}
       annotations:
         helm.sh/hook: pre-install,pre-upgrade
-        helm.sh/hook-weight: "-5"
+        helm.sh/hook-weight: "-10"
         helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
     spec:
       endpointSelector:
@@ -439,7 +490,7 @@ extraManifests:
       namespace: {{ .Release.Namespace }}
       annotations:
         helm.sh/hook: pre-install,pre-upgrade
-        helm.sh/hook-weight: "-5"
+        helm.sh/hook-weight: "-10"
         helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
     spec:
       endpointSelector:
@@ -452,26 +503,4 @@ extraManifests:
           toPorts:
             - ports:
                 - port: "9093"
-                  protocol: TCP
-
-  - |
-    apiVersion: cilium.io/v2
-    kind: CiliumNetworkPolicy
-    metadata:
-      name: operator-webhook-allow-from-apiserver
-      namespace: {{ .Release.Namespace }}
-      annotations:
-        helm.sh/hook: pre-install,pre-upgrade
-        helm.sh/hook-weight: "-10"
-        helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
-    spec:
-      endpointSelector:
-        matchLabels:
-          app.kubernetes.io/component: prometheus-operator-webhook
-      ingress:
-        - fromEntities:
-            - kube-apiserver
-          toPorts:
-            - ports:
-                - port: "443"
                   protocol: TCP
