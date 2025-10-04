@@ -339,7 +339,6 @@ extraManifests:
             - ports:
                 - port: "443"
                   protocol: TCP
-
         - toEntities:
             - kube-apiserver
           toPorts:
@@ -348,7 +347,6 @@ extraManifests:
                   protocol: TCP
                 - port: "443"
                   protocol: TCP
-
         - toEndpoints:
             - matchLabels:
                 k8s:io.kubernetes.pod.namespace: kube-system
@@ -359,7 +357,6 @@ extraManifests:
                   protocol: UDP
                 - port: "53"
                   protocol: TCP
-
         - toEndpoints:
             - matchLabels:
                 k8s:io.kubernetes.pod.namespace: kube-system
@@ -372,47 +369,90 @@ extraManifests:
                   protocol: TCP
 
   - |
-    apiVersion: gateway.networking.k8s.io/v1
-    kind: HTTPRoute
+    apiVersion: cilium.io/v2
+    kind: CiliumNetworkPolicy
     metadata:
-      name: grafana
+      name: prometheus-egress-allow
       namespace: {{ .Release.Namespace }}
-      labels:
-        app.kubernetes.io/part-of: monitoring
     spec:
-      parentRefs:
-        - name: internal-gw
-          namespace: gateway-internal
-      hostnames:
-        - grafana.home.arpa
-      rules:
-        - matches:
-            - path:
-                type: PathPrefix
-                value: /
-          filters:
-            - type: ResponseHeaderModifier
-              responseHeaderModifier:
-                add:
-                  - name: Strict-Transport-Security
-                    value: "max-age=31536000; includeSubDomains; preload"
-                  - name: X-Content-Type-Options
-                    value: "nosniff"
-                  - name: X-Frame-Options
-                    value: "DENY"
-          backendRefs:
-            - name: kube-prometheus-stack-grafana
-              port: 80
+      endpointSelector:
+        matchLabels:
+          app.kubernetes.io/name: prometheus
+      egress:
+        - toEndpoints:
+            - matchLabels:
+                k8s:io.kubernetes.pod.namespace: kube-system
+                k8s:k8s-app: kube-dns
+          toPorts:
+            - ports:
+                - port: "53"
+                  protocol: UDP
+                - port: "53"
+                  protocol: TCP
+        - toEndpoints:
+            - matchLabels:
+                k8s:io.kubernetes.pod.namespace: kube-system
+                k8s:k8s-app: coredns
+          toPorts:
+            - ports:
+                - port: "53"
+                  protocol: UDP
+                - port: "53"
+                  protocol: TCP
+        - toEntities:
+            - remote-node
+            - host
+          toPorts:
+            - ports:
+                - port: "10250"
+                  protocol: TCP
+        - toEntities:
+            - remote-node
+            - host
+          toPorts:
+            - ports:
+                - port: "9100"
+                  protocol: TCP
+        - toEntities:
+            - kube-apiserver
+          toPorts:
+            - ports:
+                - port: "6443"
+                  protocol: TCP
+                - port: "443"
+                  protocol: TCP
+                - port: "10257"
+                  protocol: TCP
+                - port: "10259"
+                  protocol: TCP
+        - toServices:
+            - k8sService:
+                namespace: default
+                serviceName: kubernetes
+          toPorts:
+            - ports:
+                - port: "443"
+                  protocol: TCP
 
   - |
     apiVersion: networking.k8s.io/v1
     kind: NetworkPolicy
     metadata:
-      name: default-deny-ingress
+      name: prometheus-allow-from-self
       namespace: {{ .Release.Namespace }}
     spec:
-      podSelector: {}
+      podSelector:
+        matchLabels:
+          app.kubernetes.io/name: prometheus
       policyTypes: ["Ingress"]
+      ingress:
+        - from:
+            - podSelector:
+                matchLabels:
+                  app.kubernetes.io/name: prometheus
+          ports:
+            - port: 9090
+              protocol: TCP
 
   - |
     apiVersion: networking.k8s.io/v1
@@ -431,27 +471,7 @@ extraManifests:
                 matchLabels:
                   kubernetes.io/metadata.name: gateway-internal
           ports:
-            - port: 80
-              protocol: TCP
-
-  - |
-    apiVersion: networking.k8s.io/v1
-    kind: NetworkPolicy
-    metadata:
-      name: prometheus-allow-from-gateway
-      namespace: {{ .Release.Namespace }}
-    spec:
-      podSelector:
-        matchLabels:
-          app.kubernetes.io/name: prometheus
-      policyTypes: ["Ingress"]
-      ingress:
-        - from:
-            - namespaceSelector:
-                matchLabels:
-                  kubernetes.io/metadata.name: gateway-internal
-          ports:
-            - port: 9090
+            - port: 3000
               protocol: TCP
 
   - |
@@ -473,3 +493,101 @@ extraManifests:
           ports:
             - port: 9093
               protocol: TCP
+
+  - |
+    apiVersion: cilium.io/v2
+    kind: CiliumNetworkPolicy
+    metadata:
+      name: alertmanager-egress-peering
+      namespace: {{ .Release.Namespace }}
+    spec:
+      endpointSelector:
+        matchLabels:
+          app.kubernetes.io/name: alertmanager
+      egress:
+        - toEndpoints:
+            - matchLabels:
+                app.kubernetes.io/name: alertmanager
+                io.cilium.k8s.namespace.name: {{ .Release.Namespace }}
+          toPorts:
+            - ports:
+                - port: "9094"
+                  protocol: TCP
+
+  - |
+    apiVersion: networking.k8s.io/v1
+    kind: NetworkPolicy
+    metadata:
+      name: ksm-allow-from-prometheus
+      namespace: {{ .Release.Namespace }}
+    spec:
+      podSelector:
+        matchLabels:
+          app.kubernetes.io/name: kube-state-metrics
+      policyTypes: ["Ingress"]
+      ingress:
+        - from:
+            - podSelector:
+                matchLabels:
+                  app.kubernetes.io/name: prometheus
+          ports:
+            - port: 8080
+              protocol: TCP
+
+  - |
+    apiVersion: cilium.io/v2
+    kind: CiliumNetworkPolicy
+    metadata:
+      name: ksm-egress-apiserver
+      namespace: {{ .Release.Namespace }}
+    spec:
+      endpointSelector:
+        matchLabels:
+          app.kubernetes.io/name: kube-state-metrics
+      egress:
+        - toEntities:
+            - kube-apiserver
+          toPorts:
+            - ports:
+                - port: "6443"
+                  protocol: TCP
+                - port: "443"
+                  protocol: TCP
+
+  - |
+    apiVersion: cilium.io/v2
+    kind: CiliumNetworkPolicy
+    metadata:
+      name: operator-egress-apiserver
+      namespace: {{ .Release.Namespace }}
+    spec:
+      endpointSelector:
+        matchLabels:
+          app.kubernetes.io/name: kube-prometheus-stack-prometheus-operator
+      egress:
+        - toEntities:
+            - kube-apiserver
+          toPorts:
+            - ports:
+                - port: "6443"
+                  protocol: TCP
+                - port: "443"
+                  protocol: TCP
+
+  - |
+    apiVersion: cilium.io/v2
+    kind: CiliumNetworkPolicy
+    metadata:
+      name: operator-webhook-allow-from-apiserver-cilium
+      namespace: {{ .Release.Namespace }}
+    spec:
+      endpointSelector:
+        matchLabels:
+          app.kubernetes.io/component: prometheus-operator-webhook
+      ingress:
+        - fromEntities:
+            - kube-apiserver
+          toPorts:
+            - ports:
+                - port: "443"
+                  protocol: TCP
