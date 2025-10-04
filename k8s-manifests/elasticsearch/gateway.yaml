@@ -3,8 +3,6 @@ kind: TLSRoute
 metadata:
   name: elasticsearch-route
   namespace: elastic-system
-  annotations:
-    gateway.cilium.io/backend-protocol: "https"
 spec:
   parentRefs:
     - name: internal-gw
@@ -13,6 +11,10 @@ spec:
   hostnames:
     - es.home.arpa
   rules:
+    - matches:
+      - path:
+        type: PathPrefix
+        value: /
     - backendRefs:
       - name: elasticsearch-es-http
         port: 9200
