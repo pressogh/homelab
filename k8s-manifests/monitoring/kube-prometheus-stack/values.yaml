@@ -344,7 +344,7 @@ extraManifests:
                   - name: X-Frame-Options
                     value: "DENY"
           backendRefs:
-            - name: {{ include "kube-prometheus-stack.grafana.fullname" . }}
+            - name: kube-prometheus-stack-grafana
               port: 80
 
   - |
