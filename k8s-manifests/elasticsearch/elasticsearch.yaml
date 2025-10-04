@@ -15,6 +15,7 @@ spec:
     config:
       node.roles: ["master"]
       node.store.allow_mmap: false
+      action.auto_create_index: "zenarmor*,.monitoring*,.watches,.triggered_watches,.watcher-history*,.ml-*,true"
     volumeClaimTemplates:
     - metadata:
         name: elasticsearch-data
@@ -44,6 +45,7 @@ spec:
     config:
       node.roles: ["master", "data", "ingest"]
       node.store.allow_mmap: false
+      action.auto_create_index: "zenarmor*,.monitoring*,.watches,.triggered_watches,.watcher-history*,.ml-*,true"
     volumeClaimTemplates:
     - metadata:
         name: elasticsearch-data
@@ -73,6 +75,7 @@ spec:
     config:
       node.roles: ["data", "ingest"]
       node.store.allow_mmap: false
+      action.auto_create_index: "zenarmor*,.monitoring*,.watches,.triggered_watches,.watcher-history*,.ml-*,true"
     volumeClaimTemplates:
     - metadata:
         name: elasticsearch-data
