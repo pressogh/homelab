@@ -352,34 +352,34 @@ extraManifests:
               port: 80
 
   - |
-    apiVersion: cilium.io/v2
-    kind: CiliumNetworkPolicy
+    apiVersion: networking.k8s.io/v1
+    kind: NetworkPolicy
     metadata:
-      name: allow-egress-core
+      name: default-deny-all
       namespace: {{ .Release.Namespace }}
       annotations:
         helm.sh/hook: pre-install,pre-upgrade
-        helm.sh/hook-weight: "-30"
+        helm.sh/hook-weight: "-40"
+        helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
+    spec:
+      podSelector: {}
+      policyTypes:
+        - Ingress
+        - Egress
+
+  - |
+    apiVersion: cilium.io/v2
+    kind: CiliumNetworkPolicy
+    metadata:
+      name: allow-dns
+      namespace: {{ .Release.Namespace }}
+      annotations:
+        helm.sh/hook: pre-install,pre-upgrade
+        helm.sh/hook-weight: "-35"
         helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
     spec:
       endpointSelector: {}
       egress:
-        - toEntities:
-            - kube-apiserver
-          toPorts:
-            - ports:
-                - port: "443"
-                  protocol: TCP
-                - port: "6443"
-                  protocol: TCP
-        - toServices:
-            - k8sService:
-                namespace: default
-                serviceName: kubernetes
-          toPorts:
-            - ports:
-                - port: "443"
-                  protocol: TCP
         - toEndpoints:
             - matchLabels:
                 k8s:io.kubernetes.pod.namespace: kube-system
@@ -389,8 +389,6 @@ extraManifests:
                 - port: "53"
                   protocol: UDP
                 - port: "53"
-                  protocol: TCP
-                - port: "9153"
                   protocol: TCP
         - toEndpoints:
             - matchLabels:
@@ -402,8 +400,56 @@ extraManifests:
                   protocol: UDP
                 - port: "53"
                   protocol: TCP
-                - port: "9153"
+
+  - |
+    apiVersion: cilium.io/v2
+    kind: CiliumNetworkPolicy
+    metadata:
+      name: allow-apiserver-egress
+      namespace: {{ .Release.Namespace }}
+      annotations:
+        helm.sh/hook: pre-install,pre-upgrade
+        helm.sh/hook-weight: "-30"
+        helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
+    spec:
+      endpointSelector:
+        matchExpressions:
+          - key: app.kubernetes.io/name
+            operator: In
+            values:
+              - prometheus
+              - kube-prometheus-stack-operator
+      egress:
+        - toEntities:
+            - kube-apiserver
+          toPorts:
+            - ports:
+                - port: "443"
                   protocol: TCP
+        - toServices:
+            - k8sService:
+                namespace: default
+                serviceName: kubernetes
+          toPorts:
+            - ports:
+                - port: "443"
+                  protocol: TCP
+
+  - |
+    apiVersion: cilium.io/v2
+    kind: CiliumNetworkPolicy
+    metadata:
+      name: prom-allow-kubelet
+      namespace: {{ .Release.Namespace }}
+      annotations:
+        helm.sh/hook: pre-install,pre-upgrade
+        helm.sh/hook-weight: "-25"
+        helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
+    spec:
+      endpointSelector:
+        matchLabels:
+          app.kubernetes.io/name: prometheus
+      egress:
         - toEntities:
             - host
             - remote-node
@@ -411,7 +457,77 @@ extraManifests:
             - ports:
                 - port: "10250"
                   protocol: TCP
+
+  - |
+    apiVersion: cilium.io/v2
+    kind: CiliumNetworkPolicy
+    metadata:
+      name: prom-allow-node-exporter
+      namespace: {{ .Release.Namespace }}
+      annotations:
+        helm.sh/hook: pre-install,pre-upgrade
+        helm.sh/hook-weight: "-24"
+        helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
+    spec:
+      endpointSelector:
+        matchLabels:
+          app.kubernetes.io/name: prometheus
+      egress:
+        - toEndpoints:
+            - matchLabels:
+                k8s:io.kubernetes.pod.namespace: {{ .Release.Namespace }}
+                k8s:app.kubernetes.io/name: prometheus-node-exporter
+          toPorts:
+            - ports:
                 - port: "9100"
+                  protocol: TCP
+
+  - |
+    apiVersion: cilium.io/v2
+    kind: CiliumNetworkPolicy
+    metadata:
+      name: prom-allow-kube-state-metrics
+      namespace: {{ .Release.Namespace }}
+      annotations:
+        helm.sh/hook: pre-install,pre-upgrade
+        helm.sh/hook-weight: "-23"
+        helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
+    spec:
+      endpointSelector:
+        matchLabels:
+          app.kubernetes.io/name: prometheus
+      egress:
+        - toEndpoints:
+            - matchLabels:
+                k8s:io.kubernetes.pod.namespace: {{ .Release.Namespace }}
+                k8s:app.kubernetes.io/name: kube-state-metrics
+          toPorts:
+            - ports:
+                - port: "8080"
+                  protocol: TCP
+
+  - |
+    apiVersion: cilium.io/v2
+    kind: CiliumNetworkPolicy
+    metadata:
+      name: prom-allow-alertmanager
+      namespace: {{ .Release.Namespace }}
+      annotations:
+        helm.sh/hook: pre-install,pre-upgrade
+        helm.sh/hook-weight: "-22"
+        helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
+    spec:
+      endpointSelector:
+        matchLabels:
+          app.kubernetes.io/name: prometheus
+      egress:
+        - toEndpoints:
+            - matchLabels:
+                k8s:io.kubernetes.pod.namespace: {{ .Release.Namespace }}
+                app.kubernetes.io/name: alertmanager
+          toPorts:
+            - ports:
+                - port: "9093"
                   protocol: TCP
 
   - |
@@ -426,13 +542,20 @@ extraManifests:
         helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
     spec:
       endpointSelector:
-        matchLabels:
-          app.kubernetes.io/component: prometheus-operator-webhook
+        matchExpressions:
+          - key: app.kubernetes.io/name
+            operator: In
+            values: ["kube-prometheus-stack-operator"]
+          - key: app.kubernetes.io/component
+            operator: In
+            values: ["prometheus-operator-webhook","admission-webhook"]
       ingress:
         - fromEntities:
             - kube-apiserver
           toPorts:
             - ports:
+                - port: "8443"
+                  protocol: TCP
                 - port: "443"
                   protocol: TCP
 
