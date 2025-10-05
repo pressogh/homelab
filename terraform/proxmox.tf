@@ -119,7 +119,7 @@ resource "proxmox_virtual_environment_vm" "worker" {
     iothread     = true
     ssd          = true
     discard      = "on"
-    size         = 128
+    size         = 256
     file_format  = "raw"
     file_id      = proxmox_virtual_environment_download_file.talos[each.value.node].id
   }
