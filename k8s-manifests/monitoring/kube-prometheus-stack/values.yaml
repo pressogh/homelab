@@ -627,3 +627,56 @@ extraManifests:
             - ports:
                 - port: "9093"
                   protocol: TCP
+  - |
+    apiVersion: cilium.io/v2
+    kind: CiliumNetworkPolicy
+    metadata:
+      name: kpstack-admission-create-egress
+      namespace: {{ .Release.Namespace }}
+      annotations:
+        helm.sh/hook: pre-install,pre-upgrade
+        helm.sh/hook-weight: "-34"
+        helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
+    spec:
+      endpointSelector:
+        matchLabels:
+          # Helm이 생성하는 Job Pod 라벨: job-name=<release>-kube-prometheus-stack-admission-create
+          k8s:job-name: {{ .Release.Name }}-kube-prometheus-stack-admission-create
+      egress:
+        - toEntities: ["kube-apiserver"]
+          toPorts:
+            - ports: [{ port: "443", protocol: TCP }]
+        - toEndpoints:
+            - matchLabels: { k8s:io.kubernetes.pod.namespace: kube-system, k8s:k8s-app: kube-dns }
+            - matchLabels: { k8s:io.kubernetes.pod.namespace: kube-system, k8s:k8s-app: coredns }
+          toPorts:
+            - ports:
+                - { port: "53", protocol: UDP }
+                - { port: "53", protocol: TCP }
+
+  - |
+    apiVersion: cilium.io/v2
+    kind: CiliumNetworkPolicy
+    metadata:
+      name: kpstack-admission-patch-egress
+      namespace: {{ .Release.Namespace }}
+      annotations:
+        helm.sh/hook: pre-install,pre-upgrade
+        helm.sh/hook-weight: "-33"
+        helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
+    spec:
+      endpointSelector:
+        matchLabels:
+          # job-name=<release>-kube-prometheus-stack-admission-patch
+          k8s:job-name: {{ .Release.Name }}-kube-prometheus-stack-admission-patch
+      egress:
+        - toEntities: ["kube-apiserver"]
+          toPorts:
+            - ports: [{ port: "443", protocol: TCP }]
+        - toEndpoints:
+            - matchLabels: { k8s:io.kubernetes.pod.namespace: kube-system, k8s:k8s-app: kube-dns }
+            - matchLabels: { k8s:io.kubernetes.pod.namespace: kube-system, k8s:k8s-app: coredns }
+          toPorts:
+            - ports:
+                - { port: "53", protocol: UDP }
+                - { port: "53", protocol: TCP }
