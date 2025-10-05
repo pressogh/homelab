@@ -118,10 +118,6 @@ grafana:
       cpu: 500m
       memory: 512Mi
 
-  networkPolicy:
-    enabled: true
-    allowExternal: false
-
 nodeExporter:
   enabled: true
 
