@@ -11,22 +11,28 @@ locals {
     {
       apiVersion = "v1"
       kind       = "Secret"
-      metadata   = {
-        name = "cloudflare-api-token",
+      metadata = {
+        name      = "cloudflare-api-token",
         namespace = "cert-manager"
       }
-      type       = "Opaque"
-      stringData = { api-token = var.cf_api_token }
+      type = "Opaque"
+      stringData = {
+        api-token = var.cf_api_token
+      }
     },
     {
       apiVersion = "cert-manager.io/v1"
       kind       = "ClusterIssuer"
-      metadata   = { name = "letsencrypt-dns01-public" }
+      metadata = {
+        name = "letsencrypt-dns01-public"
+      }
       spec = {
         acme = {
-          email               = var.acme_email
-          server              = "https://acme-v02.api.letsencrypt.org/directory"
-          privateKeySecretRef = { name = "letsencrypt-dns01-public-account-key" }
+          email  = var.acme_email
+          server = "https://acme-v02.api.letsencrypt.org/directory"
+          privateKeySecretRef = {
+            name = "letsencrypt-dns01-public-account-key"
+          }
           solvers = [{
             selector = {
               dnsZones = [var.public_domain]
@@ -35,7 +41,7 @@ locals {
               cloudflare = {
                 apiTokenSecretRef = {
                   name = "cloudflare-api-token",
-                  key = "api-token"
+                  key  = "api-token"
                 }
               }
             }

@@ -31,8 +31,20 @@ locals {
       hostnames = [local.longhorn_domain]
       rules = [
         {
-          matches     = [{ path = { type = "PathPrefix", value = "/" } }]
-          backendRefs = [{ name = "longhorn-frontend", port = 80 }]
+          matches = [
+            {
+              path = {
+                type  = "PathPrefix"
+                value = "/"
+              }
+            }
+          ]
+          backendRefs = [
+            {
+              name = "longhorn-frontend"
+              port = 80
+            }
+          ]
         }
       ]
     }

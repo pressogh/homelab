@@ -28,11 +28,9 @@ function apply {
   terraform output -raw talosconfig > output/talosconfig.yml
   terraform output -raw kubeconfig > output/kubeconfig.yml
   health
-  install-gateway-api-crd
   export-kubernetes-internal-ca-crt
   info
   merge-kubeconfig
-  restart-cilium-operator
 }
 
 function health {
@@ -66,16 +64,6 @@ function info {
   done
   step 'kubernetes nodes'
   kubectl get nodes -o wide
-}
-
-function install-gateway-api-crd {
-  step 'install gateway api crds'
-  kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.3.0/experimental-install.yaml
-}
-
-function restart-cilium-operator {
-  step 'restart cilium operator'
-  kubectl rollout restart deployment/cilium-operator -n kube-system
 }
 
 function export-kubernetes-internal-ca-crt {
@@ -116,7 +104,7 @@ function merge-kubeconfig {
   local controllers="$(terraform output -raw controllers)"
   local c0="$(echo $controllers | cut -d , -f 1)"
 
-  # 기존 컨텍스트 백업
+  # Backup existing kubeconfig if it exists
   if [ -f "$HOME/.kube/config" ]; then
     cp "$HOME/.kube/config" "$HOME/.kube/config.backup.$(date +%Y%m%d_%H%M%S)"
     echo "Backup created"

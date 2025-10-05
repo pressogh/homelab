@@ -1,4 +1,20 @@
 locals {
+  gateway_api_crd_url = "https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.3.0/experimental-install.yaml"
+  servicemonitor_crd_url = "https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/refs/tags/v0.85.0/example/prometheus-operator-crd/monitoring.coreos.com_servicemonitors.yaml"
+}
+data "http" "gateway_api_crds" {
+  url = local.gateway_api_crd_url
+}
+data "http" "servicemonitor_crd" {
+  url = local.servicemonitor_crd_url
+}
+
+locals {
+  crds_manifest = join("\n---\n", [
+    data.http.gateway_api_crds.response_body,
+    data.http.servicemonitor_crd.response_body,
+  ])
+
   cilium_external_lb_manifests = [
     {
       apiVersion = "cilium.io/v2alpha1"
@@ -43,6 +59,7 @@ locals {
   cilium_manifest = join(
     "---\n",
     [
+      local.crds_manifest,
       data.helm_template.cilium.manifest,
       local.cilium_external_lb_manifest,
     ]
@@ -50,7 +67,6 @@ locals {
 }
 
 data "helm_template" "cilium" {
-
   namespace    = "kube-system"
   name         = "cilium"
   repository   = "https://helm.cilium.io"
@@ -58,7 +74,10 @@ data "helm_template" "cilium" {
   version      = var.cilium_version
   kube_version = var.kubernetes_version
   api_versions = [
-    "gateway.networking.k8s.io/v1/GatewayClass"
+    "gateway.networking.k8s.io/v1",
+    "gateway.networking.k8s.io/v1/GatewayClass",
+    "monitoring.coreos.com/v1",
+    "monitoring.coreos.com/v1/ServiceMonitor",
   ]
   set = [
     {
@@ -144,6 +163,42 @@ data "helm_template" "cilium" {
     {
       name  = "hubble.metrics.enabled"
       value = "{dns,drop,tcp,flow,port-distribution,icmp,httpV2:exemplars=true;labelsContext=source_ip,source_namespace,source_workload,destination_ip,destination_namespace,destination_workload,traffic_direction}"
-    }
+    },
+    {
+      name  = "prometheus.serviceMonitor.enabled"
+      value = "true"
+    },
+    {
+      name  = "operator.prometheus.serviceMonitor.enabled"
+      value = "true"
+    },
+    {
+      name  = "hubble.relay.prometheus.enabled"
+      value = "true"
+    },
+    {
+      name  = "hubble.relay.prometheus.serviceMonitor.enabled"
+      value = "true"
+    },
+    {
+      name  = "prometheus.serviceMonitor.labels.release"
+      value = "kube-prometheus-stack"
+    },
+    {
+      name  = "operator.prometheus.serviceMonitor.labels.release"
+      value = "kube-prometheus-stack"
+    },
+    {
+      name  = "hubble.relay.prometheus.serviceMonitor.labels.release"
+      value = "kube-prometheus-stack"
+    },
+    {
+      name  = "prometheus.metricsService"
+      value = "true"
+    },
+    {
+      name  = "operator.prometheus.metricsService"
+      value = "true"
+    },
   ]
 }

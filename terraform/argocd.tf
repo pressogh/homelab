@@ -7,7 +7,9 @@ locals {
     kind       = "Namespace"
     metadata = {
       name   = local.argocd_namespace
-      labels = { expose = "public" }
+      labels = {
+        expose = "public"
+      }
     }
   }
 
@@ -28,8 +30,20 @@ locals {
       hostnames = [local.argocd_domain]
       rules = [
         {
-          matches     = [{ path = { type = "PathPrefix", value = "/" } }]
-          backendRefs = [{ name = "argocd-server", port = 80 }]
+          matches = [
+            {
+              path = {
+                type  = "PathPrefix"
+                value = "/"
+              }
+            }
+          ]
+          backendRefs = [
+            {
+              name = "argocd-server"
+              port = 80
+            }
+          ]
         }
       ]
     }
@@ -55,8 +69,14 @@ data "helm_template" "argocd" {
   api_versions = []
 
   values = [yamlencode({
-    global = { domain = local.argocd_domain }
-    server = { ingress = { enabled = false } }
+    global = {
+      domain = local.argocd_domain
+    }
+    server = {
+      ingress = {
+        enabled = false
+      }
+    }
     configs = {
       params = {
         "server.insecure"                                = "true"
