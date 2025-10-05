@@ -110,12 +110,40 @@ data "helm_template" "cilium" {
       value = "true"
     },
     {
+      name  = "hubble.enabled"
+      value = "true"
+    },
+    {
       name  = "hubble.relay.enabled"
       value = "true"
     },
     {
       name  = "hubble.ui.enabled"
       value = "true"
+    },
+    {
+      name  = "hubble.export.static.enabled"
+      value = "true"
+    },
+    {
+      name  = "hubble.export.static.filePath"
+      value = "/var/run/cilium/hubble/events.log"
+    },
+    {
+      name  = "prometheus.enabled"
+      value = "true"
+    },
+    {
+      name  = "operator.prometheus.enabled"
+      value = "true"
+    },
+    {
+      name  = "hubble.metrics.enableOpenMetrics"
+      value = "true"
+    },
+    {
+      name  = "hubble.metrics.enabled"
+      value = "{dns,drop,tcp,flow,port-distribution,icmp,httpV2:exemplars=true;labelsContext=source_ip,source_namespace,source_workload,destination_ip,destination_namespace,destination_workload,traffic_direction}"
     }
   ]
 }
