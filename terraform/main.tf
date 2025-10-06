@@ -7,9 +7,9 @@ module "common" {
 
   proxmox_pve_nodes = var.proxmox_pve_nodes
 
-  talos_version                 = var.talos_version
-  talos_disk_image_schematic_id = var.talos_disk_image_schematic_id
-  kubernetes_version            = var.kubernetes_version
+  talos_version                 = "1.11.1"
+  talos_disk_image_schematic_id = "88d1f7a5c4f1d3aba7df787c448c1d3d008ed29cfb34af53fa0df4336a56040b"
+  kubernetes_version            = "1.34.1"
 
   cluster_name                                     = var.cluster_name
   cluster_vip                                      = var.cluster_vip
@@ -81,4 +81,5 @@ module "argocd" {
 
   argocd_version = "8.5.7"
   argocd_domain  = "argocd.${var.public_domain}"
+  argocd_default_apps = var.argocd_default_apps
 }

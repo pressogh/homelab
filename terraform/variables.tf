@@ -30,30 +30,6 @@ variable "proxmox_pve_insecure" {
   description = "Whether to skip TLS verification for the Proxmox provider."
 }
 
-variable "talos_version" {
-  type    = string
-  default = "1.11.1"
-  validation {
-    condition     = can(regex("^\\d+(\\.\\d+)+", var.talos_version))
-    error_message = "Must be a version number."
-  }
-}
-variable "talos_disk_image_schematic_id" {
-  type        = string
-  default     = "88d1f7a5c4f1d3aba7df787c448c1d3d008ed29cfb34af53fa0df4336a56040b" # 1.11.1
-  description = "The schematic ID of the Talos disk image to use."
-}
-
-variable "kubernetes_version" {
-  type        = string
-  default     = "1.34.1"
-  description = "The version of Kubernetes to use."
-  validation {
-    condition     = can(regex("^\\d+(\\.\\d+)+", var.kubernetes_version))
-    error_message = "Must be a version number."
-  }
-}
-
 variable "cluster_name" {
   type        = string
   description = "The name to provide for the Talos cluster."
@@ -138,4 +114,14 @@ variable "internal_gw_secret_name" {
   type        = string
   description = "The internal gateway secret name."
   default     = "internal-gw-tls"
+}
+
+variable "argocd_default_apps" {
+  type = object({
+    git_url         = string
+    path            = string
+    target_revision = string
+  })
+  description = "The default apps to deploy."
+  nullable    = true
 }
