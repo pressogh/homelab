@@ -12,8 +12,10 @@ spec:
 
   transport:
     tls:
-      certificate:
-        secretName: elasticsearch-transport-certs
+      certificateAuthorities:
+        configMapName: internal-ca-bundle
+      selfSignedCertificates:
+        disabled: true
 
   nodeSets:
     - name: masters
@@ -22,6 +24,8 @@ spec:
         node.roles: ["master"]
         node.store.allow_mmap: false
         action.auto_create_index: true
+        xpack.security.transport.ssl.key: /usr/share/elasticsearch/config/cert-manager-certs/tls.key
+        xpack.security.transport.ssl.certificate: /usr/share/elasticsearch/config/cert-manager-certs/tls.crt
       volumeClaimTemplates:
         - metadata:
             name: elasticsearch-data
@@ -55,6 +59,19 @@ spec:
               env:
                 - name: ES_JAVA_OPTS
                   value: "-Xms1g -Xmx2g"
+              volumeMounts:
+                - name: transport-certs
+                  mountPath: /usr/share/elasticsearch/config/cert-manager-certs
+                  readOnly: true
+          volumes:
+            - name: transport-certs
+              csi:
+                driver: csi.cert-manager.io
+                readOnly: true
+                volumeAttributes:
+                  csi.cert-manager.io/issuer-name: internal-ca
+                  csi.cert-manager.io/issuer-kind: ClusterIssuer
+                  csi.cert-manager.io/dns-names: "*.elasticsearch-es-masters.elastic-system.svc.cluster.local,elasticsearch-es-transport.elastic-system.svc.cluster.local"
 
     - name: data
       count: 2
@@ -62,6 +79,8 @@ spec:
         node.roles: ["data", "ingest"]
         node.store.allow_mmap: false
         action.auto_create_index: true
+        xpack.security.transport.ssl.key: /usr/share/elasticsearch/config/cert-manager-certs/tls.key
+        xpack.security.transport.ssl.certificate: /usr/share/elasticsearch/config/cert-manager-certs/tls.crt
       volumeClaimTemplates:
         - metadata:
             name: elasticsearch-data
@@ -95,3 +114,16 @@ spec:
               env:
                 - name: ES_JAVA_OPTS
                   value: "-Xms2g -Xmx4g"
+              volumeMounts:
+                - name: transport-certs
+                  mountPath: /usr/share/elasticsearch/config/cert-manager-certs
+                  readOnly: true
+          volumes:
+            - name: transport-certs
+              csi:
+                driver: csi.cert-manager.io
+                readOnly: true
+                volumeAttributes:
+                  csi.cert-manager.io/issuer-name: internal-ca
+                  csi.cert-manager.io/issuer-kind: ClusterIssuer
+                  csi.cert-manager.io/dns-names: "*.elasticsearch-es-data.elastic-system.svc.cluster.local,elasticsearch-es-transport.elastic-system.svc.cluster.local"

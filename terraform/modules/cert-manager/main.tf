@@ -14,7 +14,7 @@ resource "helm_release" "cert-manager" {
   version    = var.cert_manager_version
   set = [
     {
-      name  = "installCRDs"
+      name  = "crds.enabled"
       value = "true"
     },
     {
@@ -140,10 +140,10 @@ resource "helm_release" "trust-manager" {
   depends_on = [helm_release.cert-manager]
 
   namespace  = kubernetes_namespace.cert-manager.metadata[0].name
-  name         = "trust-manager"
-  repository   = "https://charts.jetstack.io"
-  chart        = "trust-manager"
-  version      = "0.19.0"
+  name       = "trust-manager"
+  repository = "https://charts.jetstack.io"
+  chart      = "trust-manager"
+  version    = "0.19.0"
   set = [
     {
       name  = "secretTargets.enabled"
@@ -154,4 +154,36 @@ resource "helm_release" "trust-manager" {
       value = "true"
     },
   ]
+}
+
+resource "kubectl_manifest" "trust-bundle" {
+  depends_on = [helm_release.trust-manager, kubectl_manifest.internal-root-ca-certificate]
+
+  yaml_body = yamlencode({
+    apiVersion = "trust.cert-manager.io/v1alpha1"
+    kind       = "Bundle"
+    metadata = {
+      name = "internal-ca-bundle"
+    }
+    spec = {
+      sources = [
+        {
+          secret = {
+            name = "internal-root-ca"
+            key  = "tls.crt"
+          }
+        }
+      ]
+      target = {
+        configMap = {
+          key = "ca.crt"
+        }
+        namespaceSelector = {
+          matchLabels = {
+            "cert-manager.io/inject-trust" = "true"
+          }
+        }
+      }
+    }
+  })
 }

@@ -25,3 +25,4 @@ spec:
     managedNamespaceMetadata:
       labels:
         expose: internal
+        "cert-manager.io/inject-trust": true
