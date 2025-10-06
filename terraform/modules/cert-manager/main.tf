@@ -1,6 +1,9 @@
 resource "kubernetes_namespace" "cert-manager" {
   metadata {
     name = "cert-manager"
+    labels = {
+      "pod-security.kubernetes.io/enforce" = "privileged"
+    }
   }
 }
 
@@ -30,6 +33,16 @@ resource "helm_release" "cert-manager" {
       value = "true"
     },
   ]
+}
+
+resource "helm_release" "cert-manager-csi-driver" {
+  depends_on = [helm_release.cert-manager]
+
+  name       = "cert-manager-csi-driver"
+  repository = "https://charts.jetstack.io"
+  chart      = "cert-manager-csi-driver"
+  namespace  = kubernetes_namespace.cert-manager.metadata[0].name
+  version    = var.cert_manager_csi_driver_version
 }
 
 resource "kubernetes_secret" "cloudflare-api-token" {

@@ -40,6 +40,7 @@ module "cert-manager" {
   cf_api_token  = var.cf_api_token
 
   cert_manager_version  = "1.18.2"
+  cert_manager_csi_driver_version = "0.11.0"
   trust_manager_version = "0.19.0"
 }
 
