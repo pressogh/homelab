@@ -1,0 +1,68 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: elasticsearch-http-certs
+  namespace: elastic-system
+spec:
+  secretName: elasticsearch-http-certs
+  duration: 2160h  # 90 days
+  renewBefore: 360h  # 15 days before expiry
+
+  issuerRef:
+    name: internal-ca
+    kind: ClusterIssuer
+    group: cert-manager.io
+
+  commonName: elasticsearch.elastic-system.svc.cluster.local
+
+  dnsNames:
+    - elasticsearch
+    - elasticsearch.elastic-system
+    - elasticsearch.elastic-system.svc
+    - elasticsearch.elastic-system.svc.cluster.local
+    - elasticsearch-es-http
+    - elasticsearch-es-http.elastic-system.svc.cluster.local
+    - "*.elasticsearch.elastic-system.svc.cluster.local"
+    - es.home.arpa
+
+  privateKey:
+    algorithm: RSA
+    size: 2048
+
+  usages:
+    - server auth
+    - client auth
+
+---
+
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: elasticsearch-transport-certs
+  namespace: elastic-system
+spec:
+  secretName: elasticsearch-transport-certs
+  duration: 2160h  # 90 days
+  renewBefore: 360h  # 15 days before expiry
+
+  issuerRef:
+    name: internal-ca
+    kind: ClusterIssuer
+    group: cert-manager.io
+
+  commonName: "*.elasticsearch.elastic-system.svc.cluster.local"
+
+  dnsNames:
+    - "*.elasticsearch.elastic-system.svc.cluster.local"
+    - elasticsearch-es-transport.elastic-system.svc.cluster.local
+    - "*.elasticsearch-es-transport.elastic-system.svc.cluster.local"
+    - "*.elasticsearch-es-masters.elastic-system.svc.cluster.local"
+    - "*.elasticsearch-es-data.elastic-system.svc.cluster.local"
+
+  privateKey:
+    algorithm: RSA
+    size: 2048
+
+  usages:
+    - server auth
+    - client auth
