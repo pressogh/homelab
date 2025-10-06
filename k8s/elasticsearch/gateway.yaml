@@ -12,5 +12,5 @@ spec:
     - es.home.arpa
   rules:
     - backendRefs:
-      - name: elasticsearch-es-http
+      - name: elasticsearch-es-http-plain
         port: 9200
