@@ -8,6 +8,10 @@ spec:
   duration: 2160h  # 90 days
   renewBefore: 360h  # 15 days before expiry
 
+  secretTemplate:
+    annotations:
+      cert-manager.io/allow-direct-injection: "true"
+
   issuerRef:
     name: internal-ca
     kind: ClusterIssuer
@@ -44,6 +48,10 @@ spec:
   secretName: elasticsearch-transport-certs
   duration: 2160h  # 90 days
   renewBefore: 360h  # 15 days before expiry
+
+  secretTemplate:
+    annotations:
+      cert-manager.io/allow-direct-injection: "true"
 
   issuerRef:
     name: internal-ca

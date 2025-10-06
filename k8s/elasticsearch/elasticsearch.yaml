@@ -20,12 +20,6 @@ spec:
       count: 3
       config:
         node.roles: ["master"]
-        xpack.security.enabled: true
-        xpack.security.transport.ssl.enabled: true
-        xpack.security.transport.ssl.verification_mode: certificate
-        xpack.security.transport.ssl.client_authentication: required
-        xpack.security.http.ssl.enabled: true
-        xpack.security.http.ssl.client_authentication: optional
         node.store.allow_mmap: false
         action.auto_create_index: true
       volumeClaimTemplates:
@@ -66,12 +60,6 @@ spec:
       count: 2
       config:
         node.roles: ["data", "ingest"]
-        xpack.security.enabled: true
-        xpack.security.transport.ssl.enabled: true
-        xpack.security.transport.ssl.verification_mode: certificate
-        xpack.security.transport.ssl.client_authentication: required
-        xpack.security.http.ssl.enabled: true
-        xpack.security.http.ssl.client_authentication: optional
         node.store.allow_mmap: false
         action.auto_create_index: true
       volumeClaimTemplates:
