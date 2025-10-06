@@ -3,7 +3,7 @@ resource "kubernetes_namespace" "longhorn-system" {
     name = "longhorn-system"
     labels = {
       "pod-security.kubernetes.io/enforce" = "privileged"
-      "expose"                             = "public"
+      "expose"                             = "internal"
     }
   }
 }
@@ -29,13 +29,35 @@ resource "kubectl_manifest" "http-route" {
       namespace = kubernetes_namespace.longhorn-system.metadata[0].name
     }
     spec = {
+      hostnames = [var.longhorn_domain]
       parentRefs = [
         {
-          name      = "public-gw"
-          namespace = "gateway-public"
+          name        = "internal-gw"
+          namespace   = "gateway-internal"
+          sectionName = "https-wild"
         }
       ]
-      hostnames = [var.longhorn_domain]
+      filters = [
+        {
+          type = "ResponseHeaderModifier"
+          responseHeaderModifier = {
+            add = [
+              {
+                name  = "Strict-Transport-Security"
+                value = "max-age=31536000; includeSubDomains; preload"
+              },
+              {
+                name  = "X-Content-Type-Options"
+                value = "nosniff"
+              },
+              {
+                name  = "X-Frame-Options"
+                value = "DENY"
+              }
+            ]
+          }
+        }
+      ]
       rules = [
         {
           matches = [

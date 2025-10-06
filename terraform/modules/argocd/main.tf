@@ -2,7 +2,7 @@ resource "kubernetes_namespace" "argocd" {
   metadata {
     name = "argocd"
     labels = {
-      "expose" = "public"
+      "expose" = "internal"
     }
   }
 }
@@ -27,16 +27,96 @@ resource "helm_release" "argocd" {
     }
     configs = {
       params = {
-        "server.insecure"                                = "true"
-        "server.repo.server.plaintext"                   = "true"
-        "server.dex.server.plaintext"                    = "true"
-        "controller.repo.server.plaintext"               = "true"
-        "applicationsetcontroller.repo.server.plaintext" = "true"
-        "reposerver.disable.tls"                         = "true"
-        "dexserver.disable.tls"                          = "true"
+        "server.insecure" = "true"
       }
     }
   })]
+}
+
+resource "kubectl_manifest" "argocd-network-policy" {
+  depends_on = [helm_release.argocd]
+
+  yaml_body = yamlencode({
+    apiVersion = "cilium.io/v2"
+    kind       = "CiliumNetworkPolicy"
+    metadata = {
+      name      = "argocd-security"
+      namespace = kubernetes_namespace.argocd.metadata[0].name
+    }
+    spec = {
+      endpointSelector = {
+        matchLabels = {
+          "app.kubernetes.io/part-of" = "argocd"
+        }
+      }
+
+      ingress = [
+        {
+          fromEntities = ["ingress"]
+          toPorts = [
+            {
+              ports = [
+                { port = "8080", protocol = "TCP" },
+                { port = "8083", protocol = "TCP" }
+              ]
+            }
+          ]
+        },
+        {
+          fromEndpoints = [
+            {
+              matchLabels = {
+                "app.kubernetes.io/part-of" = "argocd"
+              }
+            }
+          ]
+        }
+      ]
+
+      egress = [
+        {
+          toEntities = ["kube-apiserver"]
+        },
+        {
+          toEndpoints = [
+            {
+              matchLabels = {
+                "app.kubernetes.io/part-of" = "argocd"
+              }
+            }
+          ]
+        },
+        {
+          toEndpoints = [
+            {
+              matchLabels = {
+                "io.kubernetes.pod.namespace" = "kube-system"
+                "k8s-app"                     = "kube-dns"
+              }
+            }
+          ]
+          toPorts = [
+            {
+              ports = [
+                { port = "53", protocol = "UDP" }
+              ]
+            }
+          ]
+        },
+        {
+          toEntities = ["world"]
+          toPorts = [
+            {
+              ports = [
+                { port = "443", protocol = "TCP" },
+                { port = "22", protocol = "TCP" }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  })
 }
 
 resource "kubectl_manifest" "http-route" {
@@ -50,13 +130,35 @@ resource "kubectl_manifest" "http-route" {
       namespace = kubernetes_namespace.argocd.metadata[0].name
     }
     spec = {
+      hostnames = [var.argocd_domain]
       parentRefs = [
         {
-          name      = "public-gw"
-          namespace = "gateway-public"
+          name        = "internal-gw"
+          namespace   = "gateway-internal"
+          sectionName = "https-wild"
         }
       ]
-      hostnames = [var.argocd_domain]
+      filters = [
+        {
+          type = "ResponseHeaderModifier"
+          responseHeaderModifier = {
+            add = [
+              {
+                name  = "Strict-Transport-Security"
+                value = "max-age=31536000; includeSubDomains; preload"
+              },
+              {
+                name  = "X-Content-Type-Options"
+                value = "nosniff"
+              },
+              {
+                name  = "X-Frame-Options"
+                value = "DENY"
+              }
+            ]
+          }
+        }
+      ]
       rules = [
         {
           matches = [

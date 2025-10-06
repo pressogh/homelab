@@ -68,7 +68,7 @@ module "longhorn" {
   }
 
   longhorn_version = "1.10.0"
-  longhorn_domain  = "longhorn.${var.public_domain}"
+  longhorn_domain  = "longhorn.${var.internal_domain}"
 }
 
 module "argocd" {
@@ -81,6 +81,6 @@ module "argocd" {
   }
 
   argocd_version = "8.5.7"
-  argocd_domain  = "argocd.${var.public_domain}"
+  argocd_domain  = "argocd.${var.internal_domain}"
   argocd_default_apps = var.argocd_default_apps
 }

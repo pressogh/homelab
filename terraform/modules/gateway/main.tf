@@ -261,3 +261,91 @@ resource "kubectl_manifest" "gateway-internal" {
     }
   })
 }
+
+resource "kubectl_manifest" "http-redirect-public" {
+  depends_on = [kubectl_manifest.gateway-public]
+
+  yaml_body = yamlencode({
+    apiVersion = "gateway.networking.k8s.io/v1"
+    kind       = "HTTPRoute"
+    metadata = {
+      name      = "http-redirect"
+      namespace = kubernetes_namespace.gateway-public.metadata[0].name
+    }
+    spec = {
+      hostnames = [var.public_domain, "*.${var.public_domain}"]
+      parentRefs = [
+        {
+          name      = "public-gw"
+          namespace = "gateway-public"
+        }
+      ]
+      rules = [
+        {
+          matches = [
+            {
+              path = {
+                type  = "PathPrefix"
+                value = "/"
+              }
+            }
+          ]
+          filters = [
+            {
+              type = "RequestRedirect"
+              requestRedirect = {
+                scheme = "https"
+                port   = 443
+              }
+            }
+          ]
+          backendRefs = []
+        }
+      ]
+    }
+  })
+}
+
+resource "kubectl_manifest" "http-redirect-internal" {
+  depends_on = [kubectl_manifest.gateway-internal]
+
+  yaml_body = yamlencode({
+    apiVersion = "gateway.networking.k8s.io/v1"
+    kind       = "HTTPRoute"
+    metadata = {
+      name      = "http-redirect"
+      namespace = kubernetes_namespace.gateway-internal.metadata[0].name
+    }
+    spec = {
+      hostnames = [var.internal_domain, "*.${var.internal_domain}"]
+      parentRefs = [
+        {
+          name      = "internal-gw"
+          namespace = "gateway-internal"
+        }
+      ]
+      rules = [
+        {
+          matches = [
+            {
+              path = {
+                type  = "PathPrefix"
+                value = "/"
+              }
+            }
+          ]
+          filters = [
+            {
+              type = "RequestRedirect"
+              requestRedirect = {
+                scheme = "https"
+                port   = 443
+              }
+            }
+          ]
+          backendRefs = []
+        }
+      ]
+    }
+  })
+}
