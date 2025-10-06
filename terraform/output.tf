@@ -1,17 +1,17 @@
 output "talosconfig" {
-  value     = data.talos_client_configuration.talos.talos_config
+  value     = module.common.talosconfig
   sensitive = true
 }
 
 output "kubeconfig" {
-  value     = talos_cluster_kubeconfig.talos.kubeconfig_raw
+  value     = module.common.kubeconfig
   sensitive = true
 }
 
 output "controllers" {
-  value = join(",", [for node in local.controller_nodes : node.address])
+  value = module.common.controllers
 }
 
 output "workers" {
-  value = join(",", [for node in local.worker_nodes : node.address])
+  value = module.common.workers
 }

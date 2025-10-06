@@ -1,28 +1,25 @@
-locals {
-  gateway_namespace_manifests = [
-    {
-      apiVersion = "v1"
-      kind       = "Namespace"
-      metadata = {
-        name = "gateway-public"
-        labels = {
-          expose = "public"
-        }
-      }
-    },
-    {
-      apiVersion = "v1"
-      kind       = "Namespace"
-      metadata = {
-        name = "gateway-internal"
-        labels = {
-          expose = "internal"
-        }
-      }
+resource "kubernetes_namespace" "gateway-public" {
+  metadata {
+    name = "gateway-public"
+    labels = {
+      expose = "public"
     }
-  ]
+  }
+}
 
-  gateway_public_manifest = yamlencode({
+resource "kubernetes_namespace" "gateway-internal" {
+  metadata {
+    name = "gateway-internal"
+    labels = {
+      expose = "internal"
+    }
+  }
+}
+
+resource "kubectl_manifest" "gateway-public" {
+  depends_on = [kubernetes_namespace.gateway-public]
+
+  yaml_body = yamlencode({
     apiVersion = "gateway.networking.k8s.io/v1"
     kind       = "Gateway"
     metadata = {
@@ -129,8 +126,12 @@ locals {
       ]
     }
   })
+}
 
-  gateway_internal_manifest = yamlencode({
+resource "kubectl_manifest" "gateway-internal" {
+  depends_on = [kubernetes_namespace.gateway-internal]
+
+  yaml_body = yamlencode({
     apiVersion = "gateway.networking.k8s.io/v1"
     kind       = "Gateway"
     metadata = {
@@ -259,15 +260,4 @@ locals {
       ]
     }
   })
-
-  gateway_namespace_manifest = join("---\n", [for ns in local.gateway_namespace_manifests : yamlencode(ns)])
-
-  gateway_manifest = join(
-    "---\n",
-    [
-      local.gateway_namespace_manifest,
-      local.gateway_public_manifest,
-      local.gateway_internal_manifest,
-    ]
-  )
 }

@@ -1,33 +1,9 @@
-variable "proxmox_pve_endpoint" {
-  type        = string
-  description = "Endpoint for the Proxmox provider."
-}
 variable "proxmox_pve_nodes" {
   type = set(object({
     name    = string
     address = string
   }))
   description = "Set of Proxmox nodes with their names and addresses."
-}
-variable "proxmox_pve_username" {
-  type        = string
-  description = "Proxmox username."
-  sensitive   = true
-}
-variable "proxmox_pve_api_token_id" {
-  type        = string
-  description = "The Proxmox API token ID."
-  sensitive   = true
-}
-variable "proxmox_pve_api_token_secret" {
-  type        = string
-  description = "The Proxmox API token secret."
-  sensitive   = true
-}
-variable "proxmox_pve_insecure" {
-  type        = bool
-  default     = false
-  description = "Whether to skip TLS verification for the Proxmox provider."
 }
 
 variable "talos_version" {
@@ -112,30 +88,12 @@ variable "workers" {
   description = "List of worker nodes with their Proxmox node names and VM ID."
 }
 
-variable "acme_email" {
+variable "cilium_version" {
   type        = string
-  description = "The email to use for ACME registration."
-}
-variable "public_domain" {
-  type        = string
-  description = "The public domain to use for ACME DNS-01 challenges."
-}
-variable "internal_domain" {
-  type        = string
-  description = "The internal domain to use for ACME DNS-01 challenges."
-}
-variable "cf_api_token" {
-  type        = string
-  description = "The Cloudflare API token to use for DNS-01 challenges."
-  sensitive   = true
-}
-variable "public_gw_secret_name" {
-  type        = string
-  description = "The public gateway secret name."
-  default     = "public-gw-tls"
-}
-variable "internal_gw_secret_name" {
-  type        = string
-  description = "The internal gateway secret name."
-  default     = "internal-gw-tls"
+  default     = "1.18.2"
+  description = "The version of Cilium to use."
+  validation {
+    condition     = can(regex("^\\d+(\\.\\d+)+", var.cilium_version))
+    error_message = "Must be a version number."
+  }
 }

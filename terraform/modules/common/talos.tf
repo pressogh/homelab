@@ -40,9 +40,9 @@ data "talos_machine_configuration" "controller" {
           }
         }
         etcd = {
-            extraArgs = {
-              listen-metrics-urls = "http://0.0.0.0:2381"
-            }
+          extraArgs = {
+            listen-metrics-urls = "http://0.0.0.0:2381"
+          }
         }
         inlineManifests = [
           {
@@ -59,26 +59,6 @@ data "talos_machine_configuration" "controller" {
             name     = "cilium"
             contents = local.cilium_manifest
           },
-          {
-            name     = "cert-manager"
-            contents = local.cert_manager_manifest
-          },
-          {
-            name     = "trust-manager"
-            contents = local.trust_manager_manifest
-          },
-          {
-            name     = "gateway"
-            contents = local.gateway_manifest
-          },
-          {
-            name     = "longhorn"
-            contents = local.longhorn_manifest
-          },
-          {
-            name     = "argocd"
-            contents = local.argocd_manifest
-          }
         ],
       },
     }),
@@ -139,7 +119,7 @@ resource "talos_machine_configuration_apply" "worker" {
       machine = {
         sysctls = {
           "vm.max_map_count" = 262144
-          "vm.nr_hugepages" = 1024
+          "vm.nr_hugepages"  = 1024
         }
         kernel = {
           modules = [

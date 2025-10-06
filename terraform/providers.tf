@@ -8,6 +8,18 @@ terraform {
       source  = "siderolabs/talos"
       version = "0.9.0"
     }
+    helm = {
+      source  = "hashicorp/helm"
+      version = "3.0.2"
+    }
+    kubernetes = {
+      source  = "hashicorp/kubernetes"
+      version = "2.37.1"
+    }
+    kubectl = {
+      source  = "gavinbunney/kubectl"
+      version = "1.19.0"
+    }
   }
 }
 
@@ -31,3 +43,32 @@ provider "proxmox" {
 }
 
 provider "talos" {}
+
+provider "helm" {
+  alias = "template"
+}
+
+provider "helm" {
+  alias = "workloads"
+  kubernetes = {
+    host                   = module.common.kube_client_config.host
+    cluster_ca_certificate = base64decode(module.common.kube_client_config.ca_certificate)
+    client_key             = base64decode(module.common.kube_client_config.client_key)
+    client_certificate     = base64decode(module.common.kube_client_config.client_certificate)
+  }
+}
+
+provider "kubernetes" {
+  host                   = module.common.kube_client_config.host
+  cluster_ca_certificate = base64decode(module.common.kube_client_config.ca_certificate)
+  client_key             = base64decode(module.common.kube_client_config.client_key)
+  client_certificate     = base64decode(module.common.kube_client_config.client_certificate)
+}
+
+provider "kubectl" {
+  load_config_file       = false
+  host                   = module.common.kube_client_config.host
+  cluster_ca_certificate = base64decode(module.common.kube_client_config.ca_certificate)
+  client_key             = base64decode(module.common.kube_client_config.client_key)
+  client_certificate     = base64decode(module.common.kube_client_config.client_certificate)
+}

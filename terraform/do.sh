@@ -3,7 +3,7 @@ set -euo pipefail
 
 export CHECKPOINT_DISABLE='1'
 export TF_LOG='DEBUG' # TRACE, DEBUG, INFO, WARN or ERROR.
-export TF_LOG_PATH='logs/terraform.log'
+export TF_LOG_PATH='logs/tofu.log'
 
 export TALOSCONFIG=$PWD/output/talosconfig.yml
 export KUBECONFIG=$PWD/output/kubeconfig.yml
@@ -13,20 +13,20 @@ function step {
 }
 
 function init {
-  step 'terraform init'
-  terraform init -lockfile=readonly
+  step 'tofu init'
+  tofu init -lockfile=readonly
 }
 
 function plan {
-  step 'terraform plan'
-  terraform plan -out=temp/tfplan
+  step 'tofu plan'
+  tofu plan -out=temp/tfplan
 }
 
 function apply {
-  step 'terraform apply'
-  terraform apply temp/tfplan
-  terraform output -raw talosconfig > output/talosconfig.yml
-  terraform output -raw kubeconfig > output/kubeconfig.yml
+  step 'tofu apply'
+  tofu apply temp/tfplan
+  tofu output -raw talosconfig > output/talosconfig.yml
+  tofu output -raw kubeconfig > output/kubeconfig.yml
   health
   export-kubernetes-internal-ca-crt
   info
@@ -35,8 +35,8 @@ function apply {
 
 function health {
   step 'talosctl health'
-  local controllers="$(terraform output -raw controllers)"
-  local workers="$(terraform output -raw workers)"
+  local controllers="$(tofu output -raw controllers)"
+  local workers="$(tofu output -raw workers)"
   local c0="$(echo $controllers | cut -d , -f 1)"
   talosctl -e $c0 -n $c0 \
     health \
@@ -45,8 +45,8 @@ function health {
 }
 
 function info {
-  local controllers="$(terraform output -raw controllers)"
-  local workers="$(terraform output -raw workers)"
+  local controllers="$(tofu output -raw controllers)"
+  local workers="$(tofu output -raw workers)"
   local nodes=($(echo "$controllers,$workers" | tr ',' ' '))
   step 'talos node installer image'
   for n in "${nodes[@]}"; do
@@ -95,13 +95,14 @@ function export-kubernetes-internal-ca-crt {
 }
 
 function destroy {
-  terraform destroy -auto-approve
+  step 'tofu destroy'
+  tofu destroy -auto-approve
 }
 
 function merge-kubeconfig {
   step 'merge kubeconfig to ~/.kube/config'
 
-  local controllers="$(terraform output -raw controllers)"
+  local controllers="$(tofu output -raw controllers)"
   local c0="$(echo $controllers | cut -d , -f 1)"
 
   # Backup existing kubeconfig if it exists
