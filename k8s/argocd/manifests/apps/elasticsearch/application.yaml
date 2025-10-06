@@ -4,7 +4,7 @@ metadata:
   name: elasticsearch
   namespace: argocd
 spec:
-  project: default
+  project: database
   sources:
     - repoURL: https://helm.elastic.co
       chart: eck-operator
