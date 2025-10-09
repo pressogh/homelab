@@ -13,13 +13,9 @@ spec:
   hostnames:
     - openbao.home.arpa
   rules:
-    - matches:
-      - path:
-        type: PathPrefix
-        value: /
-      backendRefs:
-        - group: ""
-          kind: Service
-          name: openbao-ui
-          port: 8200
-          weight: 1
+    - backendRefs:
+      - group: ""
+        kind: Service
+        name: openbao-ui
+        port: 8200
+        weight: 1
