@@ -22,8 +22,6 @@ alertmanager:
 
     storage:
      volumeClaimTemplate:
-       metadata:
-         creationTimestamp: null
        spec:
          storageClassName: longhorn
          accessModes: ["ReadWriteOnce"]
@@ -244,8 +242,6 @@ prometheus:
 
     storageSpec:
       volumeClaimTemplate:
-        metadata:
-          creationTimestamp: null
         spec:
           storageClassName: longhorn
           accessModes: ["ReadWriteOnce"]
