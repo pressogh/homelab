@@ -72,9 +72,9 @@ resource "kubectl_manifest" "gateway-public" {
           }
         },
 
-        # HTTPS apex
+        # HTTPS apex(TLS Terminate)
         {
-          name     = "https-apex"
+          name     = "https-apex-terminate"
           hostname = var.public_domain
           port     = 443
           protocol = "HTTPS"
@@ -98,9 +98,9 @@ resource "kubectl_manifest" "gateway-public" {
           }
         },
 
-        # HTTPS wildcard
+        # HTTPS wildcard(TLS Terminate)
         {
-          name     = "https-wild"
+          name     = "https-wild-terminate"
           hostname = "*.${var.public_domain}"
           port     = 443
           protocol = "HTTPS"
@@ -122,7 +122,49 @@ resource "kubectl_manifest" "gateway-public" {
               }
             }
           }
-        }
+        },
+
+        # HTTPS apex(TLS Passthrough)
+        {
+          name = "https-apex-passthrough"
+          hostname = var.public_domain
+          port = 443
+          protocol = "TLS"
+          tls = {
+            mode = "Passthrough"
+          }
+          allowedRoutes = {
+            namespaces = {
+              from = "Selector"
+              selector = {
+                matchLabels = {
+                  expose = "public"
+                }
+              }
+            }
+          }
+        },
+
+        # HTTPS wildcard(TLS Passthrough)
+        {
+          name = "https-wild-passthrough"
+          hostname = "*.${var.public_domain}"
+          port = 443
+          protocol = "TLS"
+          tls = {
+            mode = "Passthrough"
+          }
+          allowedRoutes = {
+            namespaces = {
+              from = "Selector"
+              selector = {
+                matchLabels = {
+                  expose = "public"
+                }
+              }
+            }
+          }
+        },
       ]
     }
   })
@@ -185,7 +227,7 @@ resource "kubectl_manifest" "gateway-internal" {
         },
 
         {
-          name     = "https-apex"
+          name     = "https-apex-terminate"
           hostname = var.internal_domain
           port     = 443
           protocol = "HTTPS"
@@ -209,7 +251,7 @@ resource "kubectl_manifest" "gateway-internal" {
           }
         },
         {
-          name     = "https-wild"
+          name     = "https-wild-terminate"
           hostname = "*.${var.internal_domain}"
           port     = 443
           protocol = "HTTPS"
@@ -220,6 +262,44 @@ resource "kubectl_manifest" "gateway-internal" {
                 name = var.internal_gw_secret_name
               }
             ]
+          }
+          allowedRoutes = {
+            namespaces = {
+              from = "Selector"
+              selector = {
+                matchLabels = {
+                  expose = "internal"
+                }
+              }
+            }
+          }
+        },
+        {
+          name = "https-apex-passthrough"
+          hostname = var.internal_domain
+          port = 443
+          protocol = "TLS"
+          tls = {
+            mode = "Passthrough"
+          }
+          allowedRoutes = {
+            namespaces = {
+              from = "Selector"
+              selector = {
+                matchLabels = {
+                  expose = "internal"
+                }
+              }
+            }
+          }
+        },
+        {
+          name = "https-wild-passthrough"
+          hostname = "*.${var.internal_domain}"
+          port = 443
+          protocol = "TLS"
+          tls = {
+            mode = "Passthrough"
           }
           allowedRoutes = {
             namespaces = {

@@ -288,6 +288,7 @@ extraManifests:
           kind: Gateway
           name: internal-gw
           namespace: gateway-internal
+          sectionName: https-wild-terminate
       hostnames:
         - grafana.home.arpa
       rules:
@@ -325,6 +326,7 @@ extraManifests:
           kind: Gateway
           name: internal-gw
           namespace: gateway-internal
+          sectionName: https-wild-terminate
       hostnames:
         - alertmanager.home.arpa
       rules:
@@ -362,6 +364,7 @@ extraManifests:
           kind: Gateway
           name: internal-gw
           namespace: gateway-internal
+          sectionName: https-wild-terminate
       hostnames:
         - prometheus.home.arpa
       rules:

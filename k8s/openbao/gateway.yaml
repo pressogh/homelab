@@ -9,6 +9,7 @@ spec:
       kind: Gateway
       name: internal-gw
       namespace: gateway-internal
+      sectionName: https-wild-passthrough
   hostnames:
     - openbao.home.arpa
   rules:

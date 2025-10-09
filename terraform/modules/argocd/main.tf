@@ -135,7 +135,7 @@ resource "kubectl_manifest" "http-route" {
         {
           name        = "internal-gw"
           namespace   = "gateway-internal"
-          sectionName = "https-wild"
+          sectionName = "https-wild-terminate"
         }
       ]
       filters = [
