@@ -136,12 +136,19 @@ server:
       secret:
         secretName: openbao-tls
         defaultMode: 0400
+    - name: ca-bundle
+      configMap:
+        name: internal-ca-bundle
     - name: tmp
       emptyDir: { }
 
   volumeMounts:
     - name: openbao-tls
       mountPath: /vault/userconfig/openbao-tls
+      readOnly: true
+    - name: ca-bundle
+      mountPath: /etc/ssl/certs/internal-ca.crt
+      subPath: ca.crt
       readOnly: true
     - name: tmp
       mountPath: /tmp
