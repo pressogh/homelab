@@ -249,3 +249,7 @@ opnsense
 terraform/output/**
 terraform/temp/**
 terraform/logs/**
+vault
+
+CLAUDE.md
+.claude
