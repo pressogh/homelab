@@ -13,7 +13,7 @@ spec:
   hostnames:
     - es.home.arpa
   rules:
-    backendRefs:
+    - backendRefs:
       - group: ""
         kind: Service
         name: elasticsearch-es-http
