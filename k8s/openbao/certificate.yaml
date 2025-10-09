@@ -20,6 +20,9 @@ spec:
     - openbao-standby
     - "*.openbao-internal"
     - "*.openbao-internal.openbao.svc.cluster.local"
+  ipAddresses:
+    - 127.0.0.1
+    - "::1"
   usages:
     - server auth
     - client auth
