@@ -33,34 +33,6 @@ resource "helm_release" "argocd" {
   })]
 }
 
-resource "kubectl_manifest" "argocd_cm_patch" {
-  depends_on = [helm_release.argocd]
-
-  yaml_body = yamlencode({
-    apiVersion = "v1"
-    kind       = "ConfigMap"
-    metadata = {
-      name      = "argocd-cm"
-      namespace = kubernetes_namespace.argocd.metadata[0].name
-    }
-    data = {
-      "resource.customizations.ignoreDifferences.all" = yamlencode({
-        jsonPointers = [
-          "/metadata/creationTimestamp"
-        ]
-      })
-      "resource.customizations.ignoreDifferences.apps_StatefulSet" = yamlencode({
-        jqPathExpressions = [
-          ".spec.volumeClaimTemplates[]?.metadata.creationTimestamp"
-        ]
-      })
-    }
-  })
-
-  force_conflicts   = true
-  server_side_apply = true
-}
-
 resource "kubectl_manifest" "argocd-network-policy" {
   depends_on = [helm_release.argocd]
 
