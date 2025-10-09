@@ -6,30 +6,7 @@ alertmanager:
 
   route:
     main:
-      enabled: true
-      apiVersion: gateway.networking.k8s.io/v1
-      kind: HTTPRoute
-      hostnames:
-       - alertmanager.home.arpa
-      parentRefs:
-        - group: gateway.networking.k8s.io
-          kind: Gateway
-          name: internal-gw
-          namespace: gateway-internal
-      filters:
-        - type: ResponseHeaderModifier
-          responseHeaderModifier:
-            add:
-              - name: Strict-Transport-Security
-                value: "max-age=31536000; includeSubDomains; preload"
-              - name: X-Content-Type-Options
-                value: "nosniff"
-              - name: X-Frame-Options
-                value: "DENY"
-      matches:
-        - path:
-            type: PathPrefix
-            value: /
+      enabled: false
 
   alertmanagerSpec:
     image:
@@ -45,6 +22,8 @@ alertmanager:
 
     storage:
      volumeClaimTemplate:
+       metadata:
+         creationTimestamp: null
        spec:
          storageClassName: longhorn
          accessModes: ["ReadWriteOnce"]
