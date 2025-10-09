@@ -14,7 +14,12 @@ spec:
     - es.home.arpa
   rules:
     - backendRefs:
-      - group: ""
-        kind: Service
-        name: elasticsearch-es-http
-        port: 9200
+        - group: ""
+          kind: Service
+          name: elasticsearch-es-http
+          port: 9200
+          weight: 1
+      matches:
+        - path:
+          type: PathPrefix
+          value: /
