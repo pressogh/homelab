@@ -84,7 +84,7 @@ hostNetwork: false
 webhook:
   create: true
   certCheckInterval: "5m"
-  lookaheadInterval: ""
+  lookaheadInterval: "720h"
   replicaCount: 1
 
   log:
