@@ -1,0 +1,36 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: openbao
+  namespace: argocd
+spec:
+  project: secret-management
+  sources:
+    - repoURL: https://openbao.github.io/openbao-helm
+      chart: openbao
+      targetRevision: 0.18.4
+      helm:
+        valueFiles:
+          - $values/k8s/openbao/values/values.yaml
+    - repoURL: https://github.com/pressogh/homelab.git
+      targetRevision: main
+      ref: values
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: openbao
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
+    managedNamespaceMetadata:
+      labels:
+        expose: internal
+        "pod-security.kubernetes.io/enforce": privileged
+        "pod-security.kubernetes.io/enforce-version": latest
+        "pod-security.kubernetes.io/warn": baseline
+        "pod-security.kubernetes.io/warn-version": latest
+        "pod-security.kubernetes.io/audit": baseline
+        "pod-security.kubernetes.io/audit-version": latest

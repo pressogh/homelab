@@ -1,0 +1,187 @@
+global:
+  enabled: true
+  tlsDisable: false
+  serverTelemetry:
+    prometheusOperator: true
+
+injector:
+  enabled: false
+
+server:
+  image:
+    registry: "quay.io"
+    repository: "openbao/openbao"
+    tag: "2.4.1"
+    pullPolicy: IfNotPresent
+
+  logLevel: "info"
+  logFormat: "standard"
+
+  resources:
+    requests:
+      memory: 256Mi
+      cpu: 250m
+    limits:
+      memory: 512Mi
+      cpu: 500m
+
+  ingress:
+    enabled: false
+
+  affinity: |
+    podAntiAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        - labelSelector:
+            matchLabels:
+              app.kubernetes.io/name: {{ template "openbao.name" . }}
+              app.kubernetes.io/instance: "{{ .Release.Name }}"
+              component: server
+          topologyKey: kubernetes.io/hostname
+
+  networkPolicy:
+    enabled: false
+
+  dataStorage:
+    enabled: true
+    size: 10Gi
+    mountPath: "/openbao/data"
+    storageClass: longhorn
+    accessMode: ReadWriteOnce
+
+  auditStorage:
+    enabled: true
+    size: 10Gi
+    mountPath: "/openbao/audit"
+    storageClass: longhorn
+    accessMode: ReadWriteOnce
+
+  dev:
+    enabled: false
+
+  ha:
+    enabled: true
+    replicas: 3
+
+    raft:
+      enabled: true
+      setNodeId: true
+
+      config: |
+        ui = true
+
+        listener "tcp" {
+          tls_disable = 0
+          address = "[::]:8200"
+          cluster_address = "[::]:8201"
+          tls_cert_file = "/vault/userconfig/openbao-tls/tls.crt"
+          tls_key_file  = "/vault/userconfig/openbao-tls/tls.key"
+
+          telemetry {
+            unauthenticated_metrics_access = "true"
+          }
+        }
+
+        storage "raft" {
+          path = "/openbao/data"
+        }
+
+        service_registration "kubernetes" {}
+
+        max_request_json_memory = "10mb"
+        max_request_json_strings = 1000
+
+        telemetry {
+          prometheus_retention_time = "30s"
+          disable_hostname = true
+        }
+
+  readinessProbe:
+    enabled: true
+    path: "/v1/sys/health?standbyok=true&sealedcode=204&uninitcode=204"
+    port: 8200
+    failureThreshold: 2
+    initialDelaySeconds: 5
+    periodSeconds: 5
+    successThreshold: 1
+    timeoutSeconds: 3
+
+  livenessProbe:
+    enabled: true
+    path: "/v1/sys/health?standbyok=true"
+    port: 8200
+    failureThreshold: 2
+    initialDelaySeconds: 60
+    periodSeconds: 5
+    successThreshold: 1
+    timeoutSeconds: 3
+
+  statefulSet:
+    securityContext:
+      pod:
+        runAsNonRoot: true
+        runAsUser: 100
+        runAsGroup: 1000
+        fsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
+      container:
+        allowPrivilegeEscalation: false
+        readOnlyRootFilesystem: true
+        capabilities:
+          drop:
+            - ALL
+
+  volumes:
+    - name: openbao-tls
+      secret:
+        secretName: openbao-tls
+        defaultMode: 0400
+
+  volumeMounts:
+    - name: openbao-tls
+      mountPath: /vault/userconfig/openbao-tls
+      readOnly: true
+
+  hostNetwork: false
+
+ui:
+  enabled: true
+  publishNotReadyAddresses: true
+  activeOpenbaoPodOnly: false
+  serviceType: "ClusterIP"
+  serviceNodePort: null
+  externalPort: 8200
+  targetPort: 8200
+
+csi:
+  enabled: false
+
+serverTelemetry:
+  serviceMonitor:
+    enabled: true
+    interval: 30s
+    scrapeTimeout: 10s
+
+  prometheusRules:
+    enabled: true
+    rules:
+      - alert: OpenBaoSealed
+        expr: bao_core_unsealed == 0
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "OpenBao is sealed"
+          description: "OpenBao instance {{ $labels.instance }} is sealed"
+
+      - alert: OpenBaoDown
+        expr: up{job="openbao"} == 0
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "OpenBao is down"
+          description: "OpenBao instance {{ $labels.instance }} is down"
+
+  grafanaDashboard:
+    enabled: false
