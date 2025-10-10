@@ -39,9 +39,9 @@ module "cert-manager" {
   public_domain = var.public_domain
   cf_api_token  = var.cf_api_token
 
-  cert_manager_version  = "1.18.2"
+  cert_manager_version            = "1.18.2"
   cert_manager_csi_driver_version = "0.11.0"
-  trust_manager_version = "0.19.0"
+  trust_manager_version           = "0.19.0"
 }
 
 module "gateway" {
@@ -80,7 +80,7 @@ module "argocd" {
     kubectl    = kubectl
   }
 
-  argocd_version = "8.5.7"
-  argocd_domain  = "argocd.${var.internal_domain}"
+  argocd_version      = "8.5.7"
+  argocd_domain       = "argocd.${var.internal_domain}"
   argocd_default_apps = var.argocd_default_apps
 }

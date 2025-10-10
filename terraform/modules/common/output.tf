@@ -9,7 +9,7 @@ output "kubeconfig" {
 }
 
 output "kube_client_config" {
-  value = talos_cluster_kubeconfig.talos.kubernetes_client_configuration
+  value     = talos_cluster_kubeconfig.talos.kubernetes_client_configuration
   sensitive = true
 }
 

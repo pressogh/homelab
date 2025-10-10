@@ -12,8 +12,8 @@ variable "cert_manager_csi_driver_version" {
   default     = "0.11.0"
   description = "The version of cert-manager-csi-driver to use."
   validation {
-      condition     = can(regex("^\\d+(\\.\\d+)+", var.cert_manager_csi_driver_version))
-      error_message = "Must be a version number."
+    condition     = can(regex("^\\d+(\\.\\d+)+", var.cert_manager_csi_driver_version))
+    error_message = "Must be a version number."
   }
 }
 variable "trust_manager_version" {
@@ -21,8 +21,8 @@ variable "trust_manager_version" {
   default     = "0.19.0"
   description = "The version of trust-manager to use."
   validation {
-      condition     = can(regex("^\\d+(\\.\\d+)+", var.trust_manager_version))
-      error_message = "Must be a version number."
+    condition     = can(regex("^\\d+(\\.\\d+)+", var.trust_manager_version))
+    error_message = "Must be a version number."
   }
 }
 
