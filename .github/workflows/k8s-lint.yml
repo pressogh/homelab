@@ -1,0 +1,107 @@
+name: Kubernetes YAML Lint and Format
+on:
+  push:
+    paths:
+      - 'k8s/**/*.yaml'
+      - 'k8s/**/*.yml'
+      - '.github/workflows/k8s-lint.yml'
+  pull_request:
+    paths:
+      - 'k8s/**/*.yaml'
+      - 'k8s/**/*.yml'
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  yamllint:
+    name: YAML Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Setup Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+
+      - name: Install yamllint
+        run: pip install yamllint
+
+      - name: Run yamllint
+        run: yamllint -f parsable k8s/
+        continue-on-error: true
+
+  kubeconform:
+    name: Kubernetes Schema Validation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Setup Kubeconform
+        run: |
+          VERSION=v0.7.0
+          curl -sSLo kubeconform.tar.gz \
+            "https://github.com/yannh/kubeconform/releases/download/${VERSION}/kubeconform-linux-amd64.tar.gz"
+          tar xf kubeconform.tar.gz
+          sudo mv kubeconform /usr/local/bin/
+          rm kubeconform.tar.gz
+
+      - name: Validate Kubernetes manifests
+        run: |
+          kubeconform -summary -output text \
+            -ignore-missing-schemas \
+            -skip Certificate,ClusterSecretStore,HTTPRoute,TLSRoute \
+            k8s/
+        continue-on-error: true
+
+  format:
+    name: YAML Format
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Setup Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+
+      - name: Install yamlfmt
+        run: |
+          curl -fsSL https://github.com/google/yamlfmt/releases/latest/download/yamlfmt_latest_Linux_x86_64.tar.gz | \
+            sudo tar -xzv -C /usr/local/bin yamlfmt
+
+      - name: Check YAML formatting
+        id: fmt
+        run: |
+          yamlfmt -lint k8s/
+        continue-on-error: true
+
+      - name: Apply YAML formatting
+        if: steps.fmt.outcome == 'failure'
+        run: yamlfmt k8s/
+
+      - name: Commit formatting changes
+        if: steps.fmt.outcome == 'failure' && github.event_name == 'push'
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add k8s/
+          git diff --cached --quiet || git commit -m "chore: auto-format kubernetes yaml files [skip ci]"
+          git push
+
+      - name: Comment on PR with formatting changes
+        if: steps.fmt.outcome == 'failure' && github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '⚠️ Kubernetes YAML formatting issues were detected. Please run `yamlfmt k8s/` locally and commit the changes.'
+            })
