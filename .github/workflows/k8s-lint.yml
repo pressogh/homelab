@@ -56,6 +56,9 @@ jobs:
           sudo mv kubeconform /usr/local/bin/
           rm kubeconform.tar.gz
 
+      - name: Create cache directory
+        run: mkdir -p ~/.cache/kubeconform
+
       - name: Validate Kubernetes manifests
         run: |
           kubeconform -summary -output text \
