@@ -19,7 +19,7 @@ permissions:
 jobs:
   lint:
     name: TFLint
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
 
@@ -44,28 +44,28 @@ jobs:
         working-directory: terraform
 
   format:
-    name: Terraform Format
-    runs-on: ubuntu-22.04
+    name: OpenTofu Format
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           fetch-depth: 0
 
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
+      - name: Setup OpenTofu
+        uses: opentofu/setup-opentofu@v1
         with:
-          terraform_version: 1.9.0
+          tofu_version: 1.10.6
 
-      - name: Check Terraform formatting
+      - name: Check OpenTofu formatting
         id: fmt
-        run: terraform fmt -check -recursive -diff
+        run: tofu fmt -check -recursive -diff
         working-directory: terraform
         continue-on-error: true
 
-      - name: Apply Terraform formatting
+      - name: Apply OpenTofu formatting
         if: steps.fmt.outcome == 'failure'
-        run: terraform fmt -recursive
+        run: tofu fmt -recursive
         working-directory: terraform
 
       - name: Commit formatting changes
@@ -86,5 +86,5 @@ jobs:
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: '⚠️ Terraform formatting issues were detected. Please run `terraform fmt -recursive` in the `terraform/` directory locally and commit the changes.'
+              body: '⚠️ OpenTofu formatting issues were detected. Please run `tofu fmt -recursive` in the `terraform/` directory locally and commit the changes.'
             })

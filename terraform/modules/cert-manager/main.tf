@@ -160,7 +160,7 @@ resource "helm_release" "trust-manager" {
   name       = "trust-manager"
   repository = "https://charts.jetstack.io"
   chart      = "trust-manager"
-  version    = "0.19.0"
+  version    = var.trust_manager_version
   set = [
     {
       name  = "secretTargets.enabled"
