@@ -2,15 +2,15 @@ name: Kubernetes YAML Lint and Format
 on:
   push:
     paths:
-      - '**/*.yaml'
-      - '**/*.yml'
-      - '.github/workflows/yaml-lint.yml'
+      - 'k8s/**/*.yaml'
+      - 'k8s/**/*.yml'
+      - '.github/workflows/k8s-lint.yml'
       - '.yamlfmt'
       - '.yamllint'
   pull_request:
     paths:
-      - '**/*.yaml'
-      - '**/*.yml'
+      - 'k8s/**/*.yaml'
+      - 'k8s/**/*.yml'
 
 permissions:
   contents: write
@@ -32,7 +32,7 @@ jobs:
         run: pip install yamllint
 
       - name: Run yamllint
-        run: yamllint -f parsable .
+        run: yamllint -f parsable k8s/
         continue-on-error: true
 
   kubeconform:
@@ -95,20 +95,20 @@ jobs:
       - name: Check YAML formatting
         id: fmt
         run: |
-          yamlfmt -lint **/*.yaml **/*.yml
+          yamlfmt -lint k8s/**/*.yaml k8s/**/*.yml
         continue-on-error: true
 
       - name: Apply YAML formatting
         if: steps.fmt.outcome == 'failure'
-        run: yamlfmt **/*.yaml **/*.yml
+        run: yamlfmt k8s/**/*.yaml k8s/**/*.yml
 
       - name: Commit formatting changes
         if: steps.fmt.outcome == 'failure' && github.event_name == 'push'
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
-          git add .
-          git diff --cached --quiet || git commit -m "chore: auto-format yaml files [skip ci]"
+          git add k8s/
+          git diff --cached --quiet || git commit -m "chore: auto-format kubernetes yaml files [skip ci]"
           git push
 
       - name: Comment on PR with formatting changes
@@ -120,5 +120,5 @@ jobs:
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: '⚠️ Kubernetes YAML formatting issues were detected. Please run `yamlfmt .` locally and commit the changes.'
+              body: '⚠️ Kubernetes YAML formatting issues were detected. Please run `yamlfmt k8s/` locally and commit the changes.'
             })
