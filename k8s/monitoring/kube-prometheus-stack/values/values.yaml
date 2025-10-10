@@ -1,34 +1,27 @@
 crds:
   enabled: true
-
 alertmanager:
   enabled: true
-
   route:
     main:
       enabled: false
-
   alertmanagerSpec:
     image:
       registry: quay.io
       repository: prometheus/alertmanager
       tag: v0.28.1
       pullPolicy: IfNotPresent
-
     replicas: 2
     retention: 120h
-
     externalUrl: https://alertmanager.home.arpa
-
     storage:
-     volumeClaimTemplate:
-       spec:
-         storageClassName: longhorn
-         accessModes: ["ReadWriteOnce"]
-         resources:
-           requests:
-             storage: 5Gi
-
+      volumeClaimTemplate:
+        spec:
+          storageClassName: longhorn
+          accessModes: ["ReadWriteOnce"]
+          resources:
+            requests:
+              storage: 5Gi
     resources:
       requests:
         cpu: 200m
@@ -36,7 +29,6 @@ alertmanager:
       limits:
         cpu: 400m
         memory: 800Mi
-
     securityContext:
       runAsNonRoot: true
       runAsUser: 1000
@@ -44,23 +36,17 @@ alertmanager:
       fsGroup: 1000
       seccompProfile:
         type: RuntimeDefault
-
   serviceAccount:
     create: true
     automountServiceAccountToken: false
-
 grafana:
   enabled: true
-
   defaultDashboardsTimezone: Asia/Seoul
   defaultDashboardsInterval: 1m
-
   adminUser: admin
   adminPassword: prom-operator
-
   ingress:
     enabled: false
-
   grafana.ini:
     server:
       domain: grafana.home.arpa
@@ -70,7 +56,6 @@ grafana:
       cookie_secure: true
       allow_embedding: false
       disable_gravatar: true
-
   persistence:
     enabled: true
     type: sts
@@ -80,14 +65,11 @@ grafana:
     size: 5Gi
     finalizers:
       - kubernetes.io/pvc-protection
-
   serviceMonitor:
     enabled: true
-
   serviceAccount:
     create: true
     automountServiceAccountToken: false
-
   resources:
     requests:
       cpu: 100m
@@ -95,10 +77,8 @@ grafana:
     limits:
       cpu: 500m
       memory: 512Mi
-
 nodeExporter:
   enabled: true
-
   operatingSystems:
     linux:
       enabled: true
@@ -106,11 +86,9 @@ nodeExporter:
       enabled: true
     darwin:
       enabled: true
-
   serviceAccount:
     create: true
     automountServiceAccountToken: false
-
   resources:
     requests:
       cpu: 50m
@@ -118,22 +96,17 @@ nodeExporter:
     limits:
       cpu: 200m
       memory: 128Mi
-
 prometheusOperator:
   enabled: true
-
   revisionHistoryLimit: 10
-
   tls:
     enabled: true
     tlsMinVersion: VersionTLS13
     internalPort: 10250
-
   livenessProbe:
     enabled: true
   readinessProbe:
     enabled: true
-
   admissionWebhooks:
     enabled: true
     failurePolicy: ""
@@ -147,10 +120,8 @@ prometheusOperator:
         repository: ingress-nginx/kube-webhook-certgen
         tag: v1.6.3
       ttlSecondsAfterFinished: 60
-
   namespaces: {}
   denyNamespaces: []
-
   networkPolicy:
     enabled: false
     flavor: cilium
@@ -160,24 +131,18 @@ prometheusOperator:
         - {}
       ingress:
         - {}
-
   serviceAccount:
     create: true
     automountServiceAccountToken: true
-
   serviceMonitor:
     selfMonitor: true
-
   env:
     GOGC: "30"
-
   image:
     registry: quay.io
     repository: prometheus-operator/prometheus-operator
     pullPolicy: IfNotPresent
-
   hostNetwork: false
-
   securityContext:
     fsGroup: 65534
     runAsGroup: 65534
@@ -185,31 +150,24 @@ prometheusOperator:
     runAsUser: 65534
     seccompProfile:
       type: RuntimeDefault
-
   containerSecurityContext:
     allowPrivilegeEscalation: false
     readOnlyRootFilesystem: true
     capabilities:
-      drop: [ "ALL" ]
-
+      drop: ["ALL"]
 prometheus:
   enabled: true
-
   route:
     main:
       enabled: false
-
   service:
     enabled: true
     type: ClusterIP
     port: 9090
-
   ingress:
     enabled: false
-
   serviceMonitor:
     selfMonitor: true
-
   networkPolicy:
     enabled: false
     flavor: cilium
@@ -219,27 +177,21 @@ prometheus:
         - {}
       ingress:
         - {}
-
   prometheusSpec:
     image:
       registry: quay.io
       repository: prometheus/prometheus
       tag: v3.6.0
-
     replicas: 2
     shards: 1
-
     retention: 10d
     walCompression: true
     enableAdminAPI: false
     externalUrl: https://prometheus.home.arpa
-
     serviceDiscoveryRole: EndpointSlice
-
     externalLabels:
       cluster: talos-homelab
       env: homelab
-
     storageSpec:
       volumeClaimTemplate:
         spec:
@@ -248,13 +200,11 @@ prometheus:
           resources:
             requests:
               storage: 20Gi
-
     ruleSelectorNilUsesHelmValues: true
     serviceMonitorSelectorNilUsesHelmValues: true
     podMonitorSelectorNilUsesHelmValues: true
     probeSelectorNilUsesHelmValues: true
     scrapeConfigSelectorNilUsesHelmValues: true
-
     securityContext:
       runAsGroup: 2000
       runAsNonRoot: true
@@ -262,17 +212,12 @@ prometheus:
       fsGroup: 2000
       seccompProfile:
         type: RuntimeDefault
-
     automountServiceAccountToken: true
-
   servicePerReplica:
     enabled: false
-
 thanosRuler:
   enabled: false
-
 cleanPrometheusOperatorObjectNames: false
-
 extraManifests:
   - |
     apiVersion: gateway.networking.k8s.io/v1
@@ -350,7 +295,7 @@ extraManifests:
               name: kube-prometheus-stack-alertmanager
               port: 9093
               weight: 1
-  - |
+  - |-
     apiVersion: gateway.networking.k8s.io/v1
     kind: HTTPRoute
     metadata:
