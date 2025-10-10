@@ -9,7 +9,7 @@ spec:
   renewBefore: 360h
   subject:
     organizations:
-      - homelab
+      - Homelab
   commonName: openbao.openbao.svc.cluster.local
   dnsNames:
     - openbao

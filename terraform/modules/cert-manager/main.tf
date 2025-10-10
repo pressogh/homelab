@@ -117,7 +117,11 @@ resource "kubectl_manifest" "internal-root-ca-certificate" {
     }
     spec = {
       isCA       = true
-      commonName = "internal-root-ca"
+      commonName = "Homelab Internal Root CA"
+      subject = {
+        organizations = ["Homelab"]
+      }
+      usages     = ["cert sign", "crl sign", "server auth", "client auth"]
       secretName = "internal-root-ca"
       privateKey = {
         algorithm = "ECDSA"
