@@ -53,7 +53,7 @@ jobs:
           kubeconform -summary -output text \
             -ignore-missing-schemas \
             -skip Certificate,ClusterSecretStore,HTTPRoute,TLSRoute \
-            k8s/
+            $(find k8s/ -name '*.yaml' -o -name '*.yml' | grep -v '/values/')
         continue-on-error: true
 
   format:
