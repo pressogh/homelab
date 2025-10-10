@@ -78,12 +78,12 @@ jobs:
       - name: Check YAML formatting
         id: fmt
         run: |
-          yamlfmt -match_type doublestar -lint -exclude '**/values/*.yaml' -exclude '**/values/*.yml' k8s/
+          yamlfmt -match_type doublestar -lint -exclude '**/values/*.{yaml,yml}' -dstar k8s/**/*.{yaml,yml}
         continue-on-error: true
 
       - name: Apply YAML formatting
         if: steps.fmt.outcome == 'failure'
-        run: yamlfmt -match_type doublestar -exclude '**/values/*.yaml' -exclude '**/values/*.yml' k8s/
+        run: yamlfmt -match_type doublestar -exclude '**/values/*.{yaml,yml}' -dstar k8s/**/*.{yaml,yml}
 
       - name: Commit formatting changes
         if: steps.fmt.outcome == 'failure' && github.event_name == 'push'
