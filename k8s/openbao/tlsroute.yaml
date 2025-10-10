@@ -14,8 +14,8 @@ spec:
     - openbao.home.arpa
   rules:
     - backendRefs:
-      - group: ""
-        kind: Service
-        name: openbao-ui
-        port: 8200
-        weight: 1
+        - group: ""
+          kind: Service
+          name: openbao-ui
+          port: 8200
+          weight: 1

@@ -14,9 +14,9 @@ spec:
     - es.home.arpa
   rules:
     - matches:
-      - path:
-          type: PathPrefix
-          value: /
+        - path:
+            type: PathPrefix
+            value: /
       filters:
         - type: ResponseHeaderModifier
           responseHeaderModifier:

@@ -9,14 +9,12 @@ spec:
     tls:
       selfSignedCertificate:
         disabled: true
-
   transport:
     tls:
       certificateAuthorities:
         configMapName: internal-ca-bundle
       selfSignedCertificates:
         disabled: true
-
   nodeSets:
     - name: masters
       count: 3
@@ -72,7 +70,6 @@ spec:
                   csi.cert-manager.io/issuer-name: internal-ca
                   csi.cert-manager.io/issuer-kind: ClusterIssuer
                   csi.cert-manager.io/dns-names: "*.elasticsearch-es-masters.elastic-system.svc.cluster.local,elasticsearch-es-transport.elastic-system.svc.cluster.local"
-
     - name: data
       count: 2
       config:
