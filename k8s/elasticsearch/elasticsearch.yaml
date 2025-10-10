@@ -136,3 +136,4 @@ spec:
                   csi.cert-manager.io/issuer-kind: ClusterIssuer
                   csi.cert-manager.io/dns-names: >
                     *.elasticsearch-es-data.elastic-system.svc.cluster.local, elasticsearch-es-transport.elastic-system.svc.cluster.local
+
