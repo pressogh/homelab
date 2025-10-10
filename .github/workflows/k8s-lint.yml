@@ -1,4 +1,5 @@
 name: Kubernetes YAML Lint and Format
+
 on:
   push:
     paths:
@@ -16,6 +17,10 @@ permissions:
   contents: write
   pull-requests: write
 
+env:
+  KUBECONFORM_VERSION: v0.7.0
+  YAMLFMT_VERSION: 0.17.2
+
 jobs:
   yamllint:
     name: YAML Lint
@@ -27,6 +32,15 @@ jobs:
         uses: actions/setup-python@v6
         with:
           python-version: '3.13'
+          cache: 'pip'
+
+      - name: Cache pip packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: pip-yamllint-${{ runner.os }}-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            pip-yamllint-${{ runner.os }}-
 
       - name: Install yamllint
         run: pip install yamllint
@@ -41,6 +55,22 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
+      - name: Cache Kubeconform binary
+        id: cache-kubeconform
+        uses: actions/cache@v4
+        with:
+          path: /usr/local/bin/kubeconform
+          key: kubeconform-${{ env.KUBECONFORM_VERSION }}-${{ runner.os }}
+
+      - name: Setup Kubeconform
+        if: steps.cache-kubeconform.outputs.cache-hit != 'true'
+        run: |
+          curl -sSLo kubeconform.tar.gz \
+            "https://github.com/yannh/kubeconform/releases/download/${{ env.KUBECONFORM_VERSION }}/kubeconform-linux-amd64.tar.gz"
+          tar xf kubeconform.tar.gz
+          sudo mv kubeconform /usr/local/bin/
+          rm kubeconform.tar.gz
+
       - name: Cache Kubeconform schemas
         uses: actions/cache@v4
         with:
@@ -48,15 +78,6 @@ jobs:
           key: kubeconform-schemas-${{ hashFiles('k8s/**/*.yaml', 'k8s/**/*.yml') }}
           restore-keys: |
             kubeconform-schemas-
-
-      - name: Setup Kubeconform
-        run: |
-          VERSION=v0.7.0
-          curl -sSLo kubeconform.tar.gz \
-            "https://github.com/yannh/kubeconform/releases/download/${VERSION}/kubeconform-linux-amd64.tar.gz"
-          tar xf kubeconform.tar.gz
-          sudo mv kubeconform /usr/local/bin/
-          rm kubeconform.tar.gz
 
       - name: Create cache directory
         run: mkdir -p ~/.cache/kubeconform
@@ -86,10 +107,17 @@ jobs:
         with:
           python-version: '3.13'
 
+      - name: Cache yamlfmt binary
+        id: cache-yamlfmt
+        uses: actions/cache@v4
+        with:
+          path: /usr/local/bin/yamlfmt
+          key: yamlfmt-${{ env.YAMLFMT_VERSION }}-${{ runner.os }}
+
       - name: Install yamlfmt
+        if: steps.cache-yamlfmt.outputs.cache-hit != 'true'
         run: |
-          VERSION=0.17.2
-          curl -fsSL "https://github.com/google/yamlfmt/releases/download/v${VERSION}/yamlfmt_${VERSION}_Linux_x86_64.tar.gz" | \
+          curl -fsSL "https://github.com/google/yamlfmt/releases/download/v${{ env.YAMLFMT_VERSION }}/yamlfmt_${{ env.YAMLFMT_VERSION }}_Linux_x86_64.tar.gz" | \
             sudo tar -xzv -C /usr/local/bin yamlfmt
 
       - name: Check YAML formatting
