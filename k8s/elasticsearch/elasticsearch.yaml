@@ -25,10 +25,8 @@ spec:
         action.auto_create_index: true
         xpack.security.transport.ssl.key: >
           /usr/share/elasticsearch/config/cert-manager-certs/tls.key
-
         xpack.security.transport.ssl.certificate: >
           /usr/share/elasticsearch/config/cert-manager-certs/tls.crt
-
       volumeClaimTemplates:
         - metadata:
             name: elasticsearch-data
@@ -76,7 +74,6 @@ spec:
                   csi.cert-manager.io/issuer-kind: ClusterIssuer
                   csi.cert-manager.io/dns-names: >
                     *.elasticsearch-es-masters.elastic-system.svc.cluster.local, elasticsearch-es-transport.elastic-system.svc.cluster.local
-
     - name: data
       count: 2
       config:
@@ -85,10 +82,8 @@ spec:
         action.auto_create_index: true
         xpack.security.transport.ssl.key: >
           /usr/share/elasticsearch/config/cert-manager-certs/tls.key
-
         xpack.security.transport.ssl.certificate: >
           /usr/share/elasticsearch/config/cert-manager-certs/tls.crt
-
       volumeClaimTemplates:
         - metadata:
             name: elasticsearch-data
@@ -136,4 +131,3 @@ spec:
                   csi.cert-manager.io/issuer-kind: ClusterIssuer
                   csi.cert-manager.io/dns-names: >
                     *.elasticsearch-es-data.elastic-system.svc.cluster.local, elasticsearch-es-transport.elastic-system.svc.cluster.local
-
