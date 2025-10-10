@@ -90,12 +90,12 @@ jobs:
       - name: Check YAML formatting
         id: fmt
         run: |
-          yamlfmt -lint k8s/
+          yamlfmt -lint k8s/**/*.yaml k8s/**/*.yml
         continue-on-error: true
 
       - name: Apply YAML formatting
         if: steps.fmt.outcome == 'failure'
-        run: yamlfmt k8s/
+        run: yamlfmt k8s/**/*.yaml k8s/**/*.yml
 
       - name: Commit formatting changes
         if: steps.fmt.outcome == 'failure' && github.event_name == 'push'
