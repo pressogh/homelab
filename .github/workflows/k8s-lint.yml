@@ -5,6 +5,8 @@ on:
       - 'k8s/**/*.yaml'
       - 'k8s/**/*.yml'
       - '.github/workflows/k8s-lint.yml'
+      - '.yamlfmt'
+      - '.yamllint'
   pull_request:
     paths:
       - 'k8s/**/*.yaml'
