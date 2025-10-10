@@ -39,6 +39,14 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
+      - name: Cache Kubeconform schemas
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/kubeconform
+          key: kubeconform-schemas-${{ hashFiles('k8s/**/*.yaml', 'k8s/**/*.yml') }}
+          restore-keys: |
+            kubeconform-schemas-
+
       - name: Setup Kubeconform
         run: |
           VERSION=v0.7.0
@@ -51,8 +59,12 @@ jobs:
       - name: Validate Kubernetes manifests
         run: |
           kubeconform -summary -output text \
+            -cache ~/.cache/kubeconform \
+            -schema-location default \
+            -schema-location 'https://raw.githubusercontent.com/datreeio/CRDs-catalog/main/{{.Group}}/{{.ResourceKind}}_{{.ResourceAPIVersion}}.json' \
             -ignore-missing-schemas \
-            $(find k8s/ -name '*.yaml' -o -name '*.yml' | grep -v '/values/')
+            -ignore-filename-pattern '/values/' \
+            k8s/
         continue-on-error: true
 
   format:
