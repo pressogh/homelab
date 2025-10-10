@@ -126,9 +126,9 @@ resource "kubectl_manifest" "gateway-public" {
 
         # HTTPS apex(TLS Passthrough)
         {
-          name = "https-apex-passthrough"
+          name     = "https-apex-passthrough"
           hostname = var.public_domain
-          port = 443
+          port     = 443
           protocol = "TLS"
           tls = {
             mode = "Passthrough"
@@ -147,9 +147,9 @@ resource "kubectl_manifest" "gateway-public" {
 
         # HTTPS wildcard(TLS Passthrough)
         {
-          name = "https-wild-passthrough"
+          name     = "https-wild-passthrough"
           hostname = "*.${var.public_domain}"
-          port = 443
+          port     = 443
           protocol = "TLS"
           tls = {
             mode = "Passthrough"
@@ -275,9 +275,9 @@ resource "kubectl_manifest" "gateway-internal" {
           }
         },
         {
-          name = "https-apex-passthrough"
+          name     = "https-apex-passthrough"
           hostname = var.internal_domain
-          port = 443
+          port     = 443
           protocol = "TLS"
           tls = {
             mode = "Passthrough"
@@ -294,9 +294,9 @@ resource "kubectl_manifest" "gateway-internal" {
           }
         },
         {
-          name = "https-wild-passthrough"
+          name     = "https-wild-passthrough"
           hostname = "*.${var.internal_domain}"
-          port = 443
+          port     = 443
           protocol = "TLS"
           tls = {
             mode = "Passthrough"
