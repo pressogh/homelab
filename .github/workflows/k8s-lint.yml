@@ -52,7 +52,6 @@ jobs:
         run: |
           kubeconform -summary -output text \
             -ignore-missing-schemas \
-            -skip Certificate,ClusterSecretStore,HTTPRoute,TLSRoute \
             $(find k8s/ -name '*.yaml' -o -name '*.yml' | grep -v '/values/')
         continue-on-error: true
 
@@ -79,12 +78,12 @@ jobs:
       - name: Check YAML formatting
         id: fmt
         run: |
-          yamlfmt -lint -exclude '**/values/*.yaml' -exclude '**/values/*.yml' k8s/
+          yamlfmt -match_type doublestar -lint -exclude '**/values/*.yaml' -exclude '**/values/*.yml' k8s/
         continue-on-error: true
 
       - name: Apply YAML formatting
         if: steps.fmt.outcome == 'failure'
-        run: yamlfmt -exclude '**/values/*.yaml' -exclude '**/values/*.yml' k8s/
+        run: yamlfmt -match_type doublestar -exclude '**/values/*.yaml' -exclude '**/values/*.yml' k8s/
 
       - name: Commit formatting changes
         if: steps.fmt.outcome == 'failure' && github.event_name == 'push'
