@@ -73,7 +73,8 @@ spec:
                   csi.cert-manager.io/issuer-name: internal-ca
                   csi.cert-manager.io/issuer-kind: ClusterIssuer
                   csi.cert-manager.io/dns-names: >
-                    *.elasticsearch-es-masters.elastic-system.svc.cluster.local, elasticsearch-es-transport.elastic-system.svc.cluster.local
+                    *.elasticsearch-es-masters.elastic-system.svc.cluster.local,
+                    elasticsearch-es-transport.elastic-system.svc.cluster.local
     - name: data
       count: 2
       config:
@@ -130,4 +131,5 @@ spec:
                   csi.cert-manager.io/issuer-name: internal-ca
                   csi.cert-manager.io/issuer-kind: ClusterIssuer
                   csi.cert-manager.io/dns-names: >
-                    *.elasticsearch-es-data.elastic-system.svc.cluster.local, elasticsearch-es-transport.elastic-system.svc.cluster.local
+                    *.elasticsearch-es-data.elastic-system.svc.cluster.local,
+                    elasticsearch-es-transport.elastic-system.svc.cluster.local
