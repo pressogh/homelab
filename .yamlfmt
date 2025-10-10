@@ -1,3 +1,9 @@
+doublestar: true
+
 exclude:
   - "**/values/*.yaml"
   - "**/values/*.yml"
+
+formatter:
+  type: basic
+  include_document_start: true
