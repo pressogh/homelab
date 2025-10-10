@@ -1,17 +1,13 @@
 name: Kubernetes YAML Lint and Format
 
 on:
-  push:
-    paths:
-      - 'k8s/**/*.yaml'
-      - 'k8s/**/*.yml'
-      - '.github/workflows/k8s-lint.yml'
-      - '.yamlfmt'
-      - '.yamllint'
   pull_request:
     paths:
       - 'k8s/**/*.yaml'
       - 'k8s/**/*.yml'
+      - '.github/workflows/k8s-lint.yml'
+      - '.config/.yamlfmt'
+      - '.config/.yamllint'
 
 permissions:
   contents: write
@@ -45,8 +41,33 @@ jobs:
         run: pip install yamllint
 
       - name: Run yamllint
-        run: yamllint -f parsable k8s/
+        id: yamllint
+        run: |
+          yamllint -c .config/.yamllint -f parsable k8s/ 2>&1 | tee yamllint-output.txt
+          exit ${PIPESTATUS[0]}
         continue-on-error: true
+
+      - name: Comment on PR with yamllint errors
+        if: steps.yamllint.outcome == 'failure'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const output = fs.readFileSync('yamllint-output.txt', 'utf8');
+            const body = `## ❌ YAML Lint Errors
+
+            \`\`\`
+            ${output}
+            \`\`\`
+
+            Please fix the yamllint errors above and push your changes.`;
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: body
+            })
 
   kubeconform:
     name: Kubernetes Schema Validation
@@ -82,6 +103,7 @@ jobs:
         run: mkdir -p ~/.cache/kubeconform
 
       - name: Validate Kubernetes manifests
+        id: kubeconform
         run: |
           kubeconform -summary -output text \
             -cache ~/.cache/kubeconform \
@@ -89,22 +111,37 @@ jobs:
             -schema-location 'https://raw.githubusercontent.com/datreeio/CRDs-catalog/main/{{.Group}}/{{.ResourceKind}}_{{.ResourceAPIVersion}}.json' \
             -ignore-missing-schemas \
             -ignore-filename-pattern '/values/' \
-            k8s/
+            k8s/ 2>&1 | tee kubeconform-output.txt
+          exit ${PIPESTATUS[0]}
         continue-on-error: true
+
+      - name: Comment on PR with kubeconform errors
+        if: steps.kubeconform.outcome == 'failure'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const output = fs.readFileSync('kubeconform-output.txt', 'utf8');
+            const body = `## ❌ Kubernetes Schema Validation Errors
+
+            \`\`\`
+            ${output}
+            \`\`\`
+
+            Please fix the kubeconform validation errors above and push your changes.`;
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: body
+            })
 
   format:
     name: YAML Format
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          fetch-depth: 0
-
-      - name: Setup Python
-        uses: actions/setup-python@v6
-        with:
-          python-version: '3.13'
 
       - name: Cache yamlfmt binary
         id: cache-yamlfmt
@@ -122,30 +159,28 @@ jobs:
       - name: Check YAML formatting
         id: fmt
         run: |
-          yamlfmt -lint k8s/**/*.yaml k8s/**/*.yml
+          yamlfmt -conf .config/.yamlfmt -lint k8s/**/*.yaml k8s/**/*.yml 2>&1 | tee yamlfmt-output.txt
+          exit ${PIPESTATUS[0]}
         continue-on-error: true
 
-      - name: Apply YAML formatting
+      - name: Comment on PR with formatting errors
         if: steps.fmt.outcome == 'failure'
-        run: yamlfmt k8s/**/*.yaml k8s/**/*.yml
-
-      - name: Commit formatting changes
-        if: steps.fmt.outcome == 'failure' && github.event_name == 'push'
-        run: |
-          git config --local user.email "github-actions[bot]@users.noreply.github.com"
-          git config --local user.name "github-actions[bot]"
-          git add k8s/
-          git diff --cached --quiet || git commit -m "chore: auto-format kubernetes yaml files [skip ci]"
-          git push
-
-      - name: Comment on PR with formatting changes
-        if: steps.fmt.outcome == 'failure' && github.event_name == 'pull_request'
         uses: actions/github-script@v7
         with:
           script: |
+            const fs = require('fs');
+            const output = fs.readFileSync('yamlfmt-output.txt', 'utf8');
+            const body = `## ⚠️ YAML Formatting Errors
+
+            \`\`\`
+            ${output}
+            \`\`\`
+
+            Please run \`yamlfmt -conf .config/.yamlfmt k8s/\` locally and commit the changes.`;
+
             github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: '⚠️ Kubernetes YAML formatting issues were detected. Please run `yamlfmt k8s/` locally and commit the changes.'
+              body: body
             })
