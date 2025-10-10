@@ -3,20 +3,16 @@ global:
   tlsDisable: false
   serverTelemetry:
     prometheusOperator: true
-
 injector:
   enabled: false
-
 server:
   image:
     registry: "quay.io"
     repository: "openbao/openbao"
     tag: "2.4.1"
     pullPolicy: IfNotPresent
-
   logLevel: "info"
   logFormat: "standard"
-
   resources:
     requests:
       memory: 256Mi
@@ -24,10 +20,8 @@ server:
     limits:
       memory: 512Mi
       cpu: 500m
-
   ingress:
     enabled: false
-
   affinity: |
     podAntiAffinity:
       requiredDuringSchedulingIgnoredDuringExecution:
@@ -37,35 +31,28 @@ server:
               app.kubernetes.io/instance: "{{ .Release.Name }}"
               component: server
           topologyKey: kubernetes.io/hostname
-
   networkPolicy:
     enabled: false
-
   dataStorage:
     enabled: true
     size: 10Gi
     mountPath: "/openbao/data"
     storageClass: longhorn
     accessMode: ReadWriteOnce
-
   auditStorage:
     enabled: true
     size: 10Gi
     mountPath: "/openbao/audit"
     storageClass: longhorn
     accessMode: ReadWriteOnce
-
   dev:
     enabled: false
-
   ha:
     enabled: true
     replicas: 3
-
     raft:
       enabled: true
       setNodeId: true
-
       config: |
         ui = true
 
@@ -94,7 +81,6 @@ server:
           prometheus_retention_time = "30s"
           disable_hostname = true
         }
-
   readinessProbe:
     enabled: true
     failureThreshold: 2
@@ -106,7 +92,6 @@ server:
       - /bin/sh
       - -c
       - /bin/bao status -tls-skip-verify
-
   livenessProbe:
     enabled: true
     failureThreshold: 2
@@ -118,7 +103,6 @@ server:
       - /bin/sh
       - -c
       - /bin/bao status -tls-skip-verify
-
   statefulSet:
     securityContext:
       pod:
@@ -134,7 +118,6 @@ server:
         capabilities:
           drop:
             - ALL
-
   volumes:
     - name: openbao-tls
       secret:
@@ -144,8 +127,7 @@ server:
       configMap:
         name: internal-ca-bundle
     - name: tmp
-      emptyDir: { }
-
+      emptyDir: {}
   volumeMounts:
     - name: openbao-tls
       mountPath: /vault/userconfig/openbao-tls
@@ -156,9 +138,7 @@ server:
       readOnly: true
     - name: tmp
       mountPath: /tmp
-
   hostNetwork: false
-
 ui:
   enabled: true
   publishNotReadyAddresses: true
@@ -167,16 +147,13 @@ ui:
   serviceNodePort: null
   externalPort: 8200
   targetPort: 8200
-
 csi:
   enabled: false
-
 serverTelemetry:
   serviceMonitor:
     enabled: true
     interval: 30s
     scrapeTimeout: 10s
-
   prometheusRules:
     enabled: true
     rules:
@@ -188,7 +165,6 @@ serverTelemetry:
         annotations:
           summary: "OpenBao is sealed"
           description: "OpenBao instance {{ $labels.instance }} is sealed"
-
       - alert: OpenBaoDown
         expr: up{job="openbao"} == 0
         for: 5m
@@ -197,6 +173,5 @@ serverTelemetry:
         annotations:
           summary: "OpenBao is down"
           description: "OpenBao instance {{ $labels.instance }} is down"
-
   grafanaDashboard:
     enabled: false
