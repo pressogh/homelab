@@ -23,9 +23,9 @@ spec:
         node.roles: ["master"]
         node.store.allow_mmap: false
         action.auto_create_index: true
-        xpack.security.transport.ssl.key: >
+        xpack.security.transport.ssl.key: >-
           /usr/share/elasticsearch/config/cert-manager-certs/tls.key
-        xpack.security.transport.ssl.certificate: >
+        xpack.security.transport.ssl.certificate: >-
           /usr/share/elasticsearch/config/cert-manager-certs/tls.crt
       volumeClaimTemplates:
         - metadata:
@@ -72,7 +72,7 @@ spec:
                 volumeAttributes:
                   csi.cert-manager.io/issuer-name: internal-ca
                   csi.cert-manager.io/issuer-kind: ClusterIssuer
-                  csi.cert-manager.io/dns-names: >
+                  csi.cert-manager.io/dns-names: >-
                     *.elasticsearch-es-masters.elastic-system.svc.cluster.local,
                     elasticsearch-es-transport.elastic-system.svc.cluster.local
     - name: data
@@ -81,9 +81,9 @@ spec:
         node.roles: ["data", "ingest"]
         node.store.allow_mmap: false
         action.auto_create_index: true
-        xpack.security.transport.ssl.key: >
+        xpack.security.transport.ssl.key: >-
           /usr/share/elasticsearch/config/cert-manager-certs/tls.key
-        xpack.security.transport.ssl.certificate: >
+        xpack.security.transport.ssl.certificate: >-
           /usr/share/elasticsearch/config/cert-manager-certs/tls.crt
       volumeClaimTemplates:
         - metadata:
@@ -130,6 +130,6 @@ spec:
                 volumeAttributes:
                   csi.cert-manager.io/issuer-name: internal-ca
                   csi.cert-manager.io/issuer-kind: ClusterIssuer
-                  csi.cert-manager.io/dns-names: >
+                  csi.cert-manager.io/dns-names: >-
                     *.elasticsearch-es-data.elastic-system.svc.cluster.local,
                     elasticsearch-es-transport.elastic-system.svc.cluster.local
