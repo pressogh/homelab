@@ -135,7 +135,7 @@ server:
         defaultMode: 0400
     - name: ca-bundle
       configMap:
-        name: internal-ca-bundle
+        name: internal-root-ca-bundle
     - name: tmp
       emptyDir: {}
 

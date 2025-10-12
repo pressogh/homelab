@@ -183,7 +183,7 @@ resource "kubectl_manifest" "trust-bundle" {
     apiVersion = "trust.cert-manager.io/v1alpha1"
     kind       = "Bundle"
     metadata = {
-      name = "internal-ca-bundle"
+      name = "internal-root-ca-bundle"
     }
     spec = {
       sources = [

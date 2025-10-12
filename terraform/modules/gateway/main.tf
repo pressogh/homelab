@@ -57,7 +57,6 @@ resource "kubectl_manifest" "public-gateway-certs" {
   })
 }
 
-
 resource "kubectl_manifest" "internal-gateway-certs" {
   depends_on = [kubernetes_namespace.gateway-internal]
 

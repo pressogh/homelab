@@ -13,7 +13,7 @@ spec:
   transport:
     tls:
       certificateAuthorities:
-        configMapName: internal-ca-bundle
+        configMapName: internal-root-ca-bundle
       selfSignedCertificates:
         disabled: true
   nodeSets:
