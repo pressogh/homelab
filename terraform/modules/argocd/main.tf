@@ -199,6 +199,9 @@ resource "kubectl_manifest" "apps" {
         repoURL        = var.argocd_default_apps.git_url
         path           = var.argocd_default_apps.path
         targetRevision = var.argocd_default_apps.target_revision
+        directory = {
+          recurse = true
+        }
       }
       destination = {
         server    = "https://kubernetes.default.svc"
