@@ -52,10 +52,8 @@ module "gateway" {
     kubectl    = kubectl
   }
 
-  public_domain           = var.public_domain
-  internal_domain         = var.internal_domain
-  public_gw_secret_name   = var.public_gw_secret_name
-  internal_gw_secret_name = var.internal_gw_secret_name
+  public_domain   = var.public_domain
+  internal_domain = var.internal_domain
 }
 
 module "longhorn" {
