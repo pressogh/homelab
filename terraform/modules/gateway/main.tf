@@ -1,3 +1,8 @@
+locals {
+  public_gateway_certs_name   = "public-gateway-certs"
+  internal_gateway_certs_name = "internal-gateway-certs"
+}
+
 resource "kubernetes_namespace" "gateway-public" {
   metadata {
     name = "gateway-public"
@@ -16,6 +21,80 @@ resource "kubernetes_namespace" "gateway-internal" {
   }
 }
 
+resource "kubectl_manifest" "public-gateway-certs" {
+  depends_on = [kubernetes_namespace.gateway-public]
+
+  yaml_body = yamlencode({
+    apiVersion = "cert-manager.io/v1"
+    kind       = "Certificate"
+    metadata = {
+      name      = local.public_gateway_certs_name
+      namespace = kubernetes_namespace.gateway-public.metadata[0].name
+    }
+    spec = {
+      secretName = local.public_gateway_certs_name
+      dnsNames = [
+        var.public_domain,
+        "*.${var.public_domain}"
+      ]
+
+      usages = [
+        "digital signature",
+        "server auth"
+      ]
+
+      privateKey = {
+        algorithm = "ECDSA"
+        size      = 256
+      }
+
+      issuerRef = {
+        name  = "letsencrypt-dns01-public"
+        kind  = "ClusterIssuer"
+        group = "cert-manager.io"
+      }
+    }
+  })
+}
+
+
+resource "kubectl_manifest" "internal-gateway-certs" {
+  depends_on = [kubernetes_namespace.gateway-internal]
+
+  yaml_body = yamlencode({
+    apiVersion = "cert-manager.io/v1"
+    kind       = "Certificate"
+    metadata = {
+      name      = local.internal_gateway_certs_name
+      namespace = kubernetes_namespace.gateway-internal.metadata[0].name
+    }
+    spec = {
+      secretName = local.internal_gateway_certs_name
+      dnsNames = [
+        var.internal_domain,
+        "*.${var.internal_domain}"
+      ]
+
+      usages = [
+        "digital signature",
+        "server auth"
+      ]
+
+      privateKey = {
+        algorithm = "ECDSA"
+        size      = 256
+      }
+
+      issuerRef = {
+        name  = "internal-ca"
+        kind  = "ClusterIssuer"
+        group = "cert-manager.io"
+      }
+    }
+  })
+}
+
+
 resource "kubectl_manifest" "gateway-public" {
   depends_on = [kubernetes_namespace.gateway-public]
 
@@ -24,10 +103,7 @@ resource "kubectl_manifest" "gateway-public" {
     kind       = "Gateway"
     metadata = {
       name      = "public-gw"
-      namespace = "gateway-public"
-      annotations = {
-        "cert-manager.io/cluster-issuer" = "letsencrypt-dns01-public"
-      }
+      namespace = kubernetes_namespace.gateway-public.metadata[0].name
     }
     spec = {
       gatewayClassName = "cilium"
@@ -82,7 +158,7 @@ resource "kubectl_manifest" "gateway-public" {
             mode = "Terminate"
             certificateRefs = [
               {
-                name = var.public_gw_secret_name
+                name = local.public_gateway_certs_name
               }
             ]
           }
@@ -108,7 +184,7 @@ resource "kubectl_manifest" "gateway-public" {
             mode = "Terminate"
             certificateRefs = [
               {
-                name = var.public_gw_secret_name
+                name = local.public_gateway_certs_name
               }
             ]
           }
@@ -171,17 +247,14 @@ resource "kubectl_manifest" "gateway-public" {
 }
 
 resource "kubectl_manifest" "gateway-internal" {
-  depends_on = [kubernetes_namespace.gateway-internal]
+  depends_on = [kubernetes_namespace.gateway-internal, kubectl_manifest.internal-gateway-certs]
 
   yaml_body = yamlencode({
     apiVersion = "gateway.networking.k8s.io/v1"
     kind       = "Gateway"
     metadata = {
       name      = "internal-gw"
-      namespace = "gateway-internal"
-      annotations = {
-        "cert-manager.io/cluster-issuer" = "internal-ca"
-      }
+      namespace = kubernetes_namespace.gateway-internal.metadata[0].name
     }
     spec = {
       gatewayClassName = "cilium"
@@ -235,7 +308,7 @@ resource "kubectl_manifest" "gateway-internal" {
             mode = "Terminate"
             certificateRefs = [
               {
-                name = var.internal_gw_secret_name
+                name = local.internal_gateway_certs_name
               }
             ]
           }
@@ -259,7 +332,7 @@ resource "kubectl_manifest" "gateway-internal" {
             mode = "Terminate"
             certificateRefs = [
               {
-                name = var.internal_gw_secret_name
+                name = local.internal_gateway_certs_name
               }
             ]
           }
@@ -322,7 +395,7 @@ resource "kubectl_manifest" "gateway-internal" {
             mode = "Terminate"
             certificateRefs = [
               {
-                name = var.internal_gw_secret_name
+                name = local.internal_gateway_certs_name
               }
             ]
           }

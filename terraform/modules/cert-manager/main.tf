@@ -120,8 +120,11 @@ resource "kubectl_manifest" "internal-root-ca-certificate" {
       commonName = "Homelab Internal Root CA"
       subject = {
         organizations = ["Homelab"]
+        countries     = ["KR"]
+        provinces     = ["Seoul"]
+        localities    = ["Seoul"]
       }
-      usages     = ["cert sign", "crl sign", "server auth", "client auth"]
+      usages     = ["cert sign", "crl sign"]
       secretName = "internal-root-ca"
       privateKey = {
         algorithm = "ECDSA"
