@@ -11,9 +11,9 @@ metadata:
 spec:
   project: infrastructure
   source:
-    repoURL: https://charts.jetstack.io
+    repoURL: quay.io/jetstack/charts
     chart: trust-manager
-    targetRevision: v0.14.1
+    targetRevision: v0.22.0
     helm:
       valuesObject:
         crds:

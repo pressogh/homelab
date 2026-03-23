@@ -13,6 +13,7 @@ spec:
   sourceRepos:
     - https://github.com/pressogh/homelab.git
     - https://charts.jetstack.io
+    - quay.io/jetstack/charts
     - https://charts.external-secrets.io
     - https://github.com/external-secrets/external-secrets
   destinations:

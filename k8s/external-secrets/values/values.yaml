@@ -6,6 +6,8 @@ image:
   # -- The image tag to use. The default is the chart appVersion.
   tag: ""
 installCRDs: false
+bitwarden-sdk-server:
+  enabled: true
 crds:
   createClusterExternalSecret: true
   createClusterSecretStore: true
