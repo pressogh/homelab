@@ -31,3 +31,4 @@ spec:
           requestRedirect:
             scheme: https
             port: 443
+            statusCode: 302

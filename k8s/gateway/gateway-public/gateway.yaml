@@ -45,6 +45,7 @@ spec:
         mode: Terminate
         certificateRefs:
           - kind: Secret
+            group: ""
             name: public-gateway-certs
     - name: https-wild-terminate
       protocol: HTTPS
@@ -60,6 +61,7 @@ spec:
         mode: Terminate
         certificateRefs:
           - kind: Secret
+            group: ""
             name: public-gateway-certs
     - name: https-apex-passthrough
       protocol: TLS
