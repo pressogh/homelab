@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: longhorn-system
+  labels:
+    expose: internal
+    pod-security.kubernetes.io/enforce: privileged
+    trust.cert-manager.io/inject: "true"
+  annotations:
+    argocd.argoproj.io/sync-wave: "-3"

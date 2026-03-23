@@ -88,40 +88,12 @@ variable "workers" {
   description = "List of worker nodes with their Proxmox node names and VM ID."
 }
 
-variable "acme_email" {
-  type        = string
-  description = "The email to use for ACME registration."
-}
-variable "public_domain" {
-  type        = string
-  description = "The public domain to use for ACME DNS-01 challenges."
-}
 variable "internal_domain" {
   type        = string
-  description = "The internal domain to use for ACME DNS-01 challenges."
+  description = "The internal domain for ArgoCD and other internal services."
 }
-variable "cf_api_token" {
+variable "bitwarden_access_token" {
   type        = string
-  description = "The Cloudflare API token to use for DNS-01 challenges."
+  description = "Bitwarden Secrets Manager access token for External Secrets Operator."
   sensitive   = true
-}
-variable "public_gw_secret_name" {
-  type        = string
-  description = "The public gateway secret name."
-  default     = "public-gw-tls"
-}
-variable "internal_gw_secret_name" {
-  type        = string
-  description = "The internal gateway secret name."
-  default     = "internal-gw-tls"
-}
-
-variable "argocd_default_apps" {
-  type = object({
-    git_url         = string
-    path            = string
-    target_revision = string
-  })
-  description = "The default apps to deploy."
-  nullable    = true
 }

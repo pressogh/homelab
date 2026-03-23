@@ -1,0 +1,102 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: internal-gw
+  namespace: gateway-internal
+  annotations:
+    argocd.argoproj.io/sync-wave: "3"
+spec:
+  gatewayClassName: cilium
+  addresses:
+    - type: IPAddress
+      value: 192.168.110.221
+  listeners:
+    - name: http-apex
+      protocol: HTTP
+      port: 80
+      hostname: home.arpa
+      allowedRoutes:
+        namespaces:
+          from: Selector
+          selector:
+            matchLabels:
+              expose: internal
+    - name: http-wild
+      protocol: HTTP
+      port: 80
+      hostname: "*.home.arpa"
+      allowedRoutes:
+        namespaces:
+          from: Selector
+          selector:
+            matchLabels:
+              expose: internal
+    - name: https-apex-terminate
+      protocol: HTTPS
+      port: 443
+      hostname: home.arpa
+      allowedRoutes:
+        namespaces:
+          from: Selector
+          selector:
+            matchLabels:
+              expose: internal
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - kind: Secret
+            name: internal-gateway-certs
+    - name: https-wild-terminate
+      protocol: HTTPS
+      port: 443
+      hostname: "*.home.arpa"
+      allowedRoutes:
+        namespaces:
+          from: Selector
+          selector:
+            matchLabels:
+              expose: internal
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - kind: Secret
+            name: internal-gateway-certs
+    - name: https-apex-passthrough
+      protocol: TLS
+      port: 443
+      hostname: home.arpa
+      allowedRoutes:
+        namespaces:
+          from: Selector
+          selector:
+            matchLabels:
+              expose: internal
+      tls:
+        mode: Passthrough
+    - name: https-wild-passthrough
+      protocol: TLS
+      port: 443
+      hostname: "*.home.arpa"
+      allowedRoutes:
+        namespaces:
+          from: Selector
+          selector:
+            matchLabels:
+              expose: internal
+      tls:
+        mode: Passthrough
+    - name: es-https-apex
+      protocol: HTTPS
+      port: 9200
+      hostname: es.home.arpa
+      allowedRoutes:
+        namespaces:
+          from: Selector
+          selector:
+            matchLabels:
+              expose: internal
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - kind: Secret
+            name: internal-gateway-certs

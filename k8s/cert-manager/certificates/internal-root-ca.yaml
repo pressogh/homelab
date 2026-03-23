@@ -1,0 +1,30 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: internal-root-ca
+  namespace: cert-manager
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  isCA: true
+  commonName: "Homelab Internal Root CA"
+  subject:
+    organizations:
+      - "Homelab"
+    countries:
+      - "KR"
+    provinces:
+      - "Seoul"
+    localities:
+      - "Seoul"
+  usages:
+    - cert sign
+    - crl sign
+  secretName: internal-root-ca
+  privateKey:
+    algorithm: ECDSA
+    size: 256
+  issuerRef:
+    name: internal-selfsigned
+    kind: ClusterIssuer
+    group: cert-manager.io

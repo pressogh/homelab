@@ -97,3 +97,9 @@ variable "cilium_version" {
     error_message = "Must be a version number."
   }
 }
+
+variable "bitwarden_access_token" {
+  type        = string
+  description = "Bitwarden Secrets Manager access token for External Secrets Operator."
+  sensitive   = true
+}

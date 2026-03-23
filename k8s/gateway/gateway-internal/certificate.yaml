@@ -1,0 +1,22 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: internal-gateway-certs
+  namespace: gateway-internal
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+spec:
+  secretName: internal-gateway-certs
+  issuerRef:
+    name: internal-ca
+    kind: ClusterIssuer
+    group: cert-manager.io
+  dnsNames:
+    - home.arpa
+    - "*.home.arpa"
+  privateKey:
+    algorithm: ECDSA
+    size: 256
+  usages:
+    - digital signature
+    - server auth

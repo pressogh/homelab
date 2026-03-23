@@ -5,7 +5,7 @@ image:
   pullPolicy: IfNotPresent
   # -- The image tag to use. The default is the chart appVersion.
   tag: ""
-installCRDs: true
+installCRDs: false
 crds:
   createClusterExternalSecret: true
   createClusterSecretStore: true

@@ -59,6 +59,14 @@ data "talos_machine_configuration" "controller" {
             name     = "cilium"
             contents = local.cilium_manifest
           },
+          {
+            name     = "external-secrets-namespace"
+            contents = yamlencode(local.external_secrets_namespace_manifest)
+          },
+          {
+            name     = "bitwarden-credentials"
+            contents = yamlencode(local.bitwarden_credentials_manifest)
+          },
         ],
       },
     }),

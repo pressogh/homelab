@@ -1,0 +1,48 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: longhorn
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "3"
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: storage
+  source:
+    repoURL: https://charts.longhorn.io
+    chart: longhorn
+    targetRevision: 1.7.2
+    helm:
+      valuesObject:
+        persistence:
+          defaultClass: true
+          defaultClassReplicaCount: 3
+        defaultSettings:
+          backupTarget: ""
+          defaultReplicaCount: 3
+          guaranteedInstanceManagerCpu: 12
+        ingress:
+          enabled: false
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: longhorn-system
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
+    managedNamespaceMetadata:
+      labels:
+        expose: internal
+        pod-security.kubernetes.io/enforce: privileged
+        trust.cert-manager.io/inject: "true"
+    retry:
+      limit: 3
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m

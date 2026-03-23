@@ -1,0 +1,22 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: public-gateway-certs
+  namespace: gateway-public
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+spec:
+  secretName: public-gateway-certs
+  issuerRef:
+    name: letsencrypt-dns01-public
+    kind: ClusterIssuer
+    group: cert-manager.io
+  dnsNames:
+    - presso.ac
+    - "*.presso.ac"
+  privateKey:
+    algorithm: ECDSA
+    size: 256
+  usages:
+    - digital signature
+    - server auth

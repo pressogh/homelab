@@ -23,50 +23,8 @@ module "common" {
   controllers = var.controllers
   workers     = var.workers
 
-  cilium_version = "1.18.2"
-}
-
-module "cert-manager" {
-  source = "./modules/cert-manager"
-
-  providers = {
-    helm       = helm.workloads
-    kubernetes = kubernetes
-    kubectl    = kubectl
-  }
-
-  acme_email    = var.acme_email
-  public_domain = var.public_domain
-  cf_api_token  = var.cf_api_token
-
-  cert_manager_version            = "1.18.2"
-  cert_manager_csi_driver_version = "0.11.0"
-  trust_manager_version           = "0.19.0"
-}
-
-module "gateway" {
-  source = "./modules/gateway"
-
-  providers = {
-    kubernetes = kubernetes
-    kubectl    = kubectl
-  }
-
-  public_domain   = var.public_domain
-  internal_domain = var.internal_domain
-}
-
-module "longhorn" {
-  source = "./modules/longhorn"
-
-  providers = {
-    helm       = helm.workloads
-    kubernetes = kubernetes
-    kubectl    = kubectl
-  }
-
-  longhorn_version = "1.10.0"
-  longhorn_domain  = "longhorn.${var.internal_domain}"
+  cilium_version         = "1.18.2"
+  bitwarden_access_token = var.bitwarden_access_token
 }
 
 module "argocd" {
@@ -78,7 +36,6 @@ module "argocd" {
     kubectl    = kubectl
   }
 
-  argocd_version      = "8.5.7"
-  argocd_domain       = "argocd.${var.internal_domain}"
-  argocd_default_apps = var.argocd_default_apps
+  argocd_version = "8.5.7"
+  argocd_domain  = "argocd.${var.internal_domain}"
 }

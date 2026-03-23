@@ -69,10 +69,31 @@ function info {
 function export-kubernetes-internal-ca-crt {
   step 'export kubernetes-internal-ca-crt.pem'
 
-  local max_wait=300
+  local max_wait=900
   local elapsed=0
   local interval=5
 
+  echo "Waiting for Argo CD to reconcile cert-manager bootstrap (max ${max_wait}s)..."
+
+  while [ $elapsed -lt $max_wait ]; do
+    if kubectl get -n argocd application/cert-manager application/cert-manager-resources &>/dev/null; then
+      local cert_manager_health
+      local cert_manager_resources_health
+      cert_manager_health="$(kubectl get -n argocd application/cert-manager -o jsonpath='{.status.health.status}' 2>/dev/null || true)"
+      cert_manager_resources_health="$(kubectl get -n argocd application/cert-manager-resources -o jsonpath='{.status.health.status}' 2>/dev/null || true)"
+
+      if [ "$cert_manager_health" = "Healthy" ] && [ "$cert_manager_resources_health" = "Healthy" ]; then
+        echo "Argo CD applications are healthy after ${elapsed}s"
+        break
+      fi
+    fi
+
+    sleep $interval
+    elapsed=$((elapsed + interval))
+    echo "Still waiting for Argo CD applications... (${elapsed}/${max_wait}s)"
+  done
+
+  elapsed=0
   echo "Waiting for secret/internal-root-ca in cert-manager namespace (max ${max_wait}s)..."
 
   while [ $elapsed -lt $max_wait ]; do

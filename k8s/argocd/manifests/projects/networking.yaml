@@ -1,0 +1,29 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: networking
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "-5"
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  description: Shared networking resources and gateways
+  sourceRepos:
+    - https://github.com/pressogh/homelab.git
+  destinations:
+    - namespace: gateway-public
+      server: https://kubernetes.default.svc
+    - namespace: gateway-internal
+      server: https://kubernetes.default.svc
+  clusterResourceWhitelist:
+    - group: ""
+      kind: Namespace
+    - group: gateway.networking.k8s.io
+      kind: '*'
+    - group: cert-manager.io
+      kind: Certificate
+  namespaceResourceWhitelist:
+    - group: '*'
+      kind: '*'
