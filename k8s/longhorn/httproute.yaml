@@ -29,4 +29,7 @@ spec:
                 value: "DENY"
       backendRefs:
         - name: longhorn-frontend
+          group: ""
+          kind: Service
           port: 80
+          weight: 1

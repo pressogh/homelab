@@ -10,6 +10,11 @@ metadata:
     - resources-finalizer.argocd.argoproj.io
 spec:
   project: storage
+  ignoreDifferences:
+    - group: apiextensions.k8s.io
+      kind: CustomResourceDefinition
+      jsonPointers:
+        - /spec/conversion/webhook/clientConfig/caBundle
   source:
     repoURL: https://charts.longhorn.io
     chart: longhorn

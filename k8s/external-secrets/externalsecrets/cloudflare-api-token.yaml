@@ -13,7 +13,11 @@ spec:
   target:
     name: cloudflare-api-token
     creationPolicy: Owner
+    deletionPolicy: Retain
   data:
     - secretKey: api-token
       remoteRef:
+        conversionStrategy: Default
+        decodingStrategy: None
         key: "fecccd3f-0c8b-4fa4-8927-b41600188c5a"
+        metadataPolicy: None
