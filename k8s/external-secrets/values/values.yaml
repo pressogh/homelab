@@ -8,6 +8,21 @@ image:
 installCRDs: false
 bitwarden-sdk-server:
   enabled: true
+  podSecurityContext:
+    runAsNonRoot: true
+    runAsUser: 1000
+    seccompProfile:
+      type: RuntimeDefault
+  securityContext:
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+        - ALL
+    readOnlyRootFilesystem: true
+    runAsNonRoot: true
+    runAsUser: 1000
+    seccompProfile:
+      type: RuntimeDefault
 crds:
   createClusterExternalSecret: true
   createClusterSecretStore: true
