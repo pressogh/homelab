@@ -36,6 +36,6 @@ module "argocd" {
     kubectl    = kubectl
   }
 
-  argocd_version = "8.5.7"
+  argocd_version = "9.4.15"
   argocd_domain  = "argocd.${var.internal_domain}"
 }
