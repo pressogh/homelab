@@ -23,6 +23,7 @@ spec:
     chart: longhorn
     targetRevision: 1.10.2
     helm:
+      skipCrds: true
       valuesObject:
         preUpgradeChecker:
           jobEnabled: false
