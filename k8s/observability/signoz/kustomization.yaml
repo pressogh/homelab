@@ -4,3 +4,4 @@ kind: Kustomization
 
 resources:
   - httproute.yaml
+  - signoz-clickhouse-service.yaml
