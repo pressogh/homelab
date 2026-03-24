@@ -5,6 +5,7 @@ metadata:
   name: kubeshark
   namespace: argocd
   annotations:
+    argocd.argoproj.io/compare-options: IgnoreExtraneous
     argocd.argoproj.io/sync-wave: "3"
   finalizers:
     - resources-finalizer.argocd.argoproj.io
