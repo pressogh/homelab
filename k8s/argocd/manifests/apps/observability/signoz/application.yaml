@@ -17,16 +17,31 @@ spec:
       jsonPointers:
         - /spec/template/spec/containers/0/resources
         - /spec/template/spec/containers/1/resources
+        - /spec/template/spec/dnsPolicy
+        - /spec/template/spec/restartPolicy
+        - /spec/template/spec/schedulerName
+        - /spec/template/spec/serviceAccount
+        - /spec/template/spec/terminationGracePeriodSeconds
     - group: apps
       kind: StatefulSet
       name: signoz
       jsonPointers:
+        - /spec/template/spec/dnsPolicy
         - /spec/persistentVolumeClaimRetentionPolicy
+        - /spec/template/spec/restartPolicy
+        - /spec/template/spec/schedulerName
+        - /spec/template/spec/serviceAccount
+        - /spec/template/spec/terminationGracePeriodSeconds
     - group: apps
       kind: StatefulSet
       name: signoz-zookeeper
       jsonPointers:
+        - /spec/template/spec/dnsPolicy
         - /spec/persistentVolumeClaimRetentionPolicy
+        - /spec/template/spec/restartPolicy
+        - /spec/template/spec/schedulerName
+        - /spec/template/spec/serviceAccount
+        - /spec/template/spec/terminationGracePeriodSeconds
   sources:
     - repoURL: https://charts.signoz.io
       chart: signoz
