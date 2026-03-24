@@ -3,6 +3,10 @@ global:
   storageClass: longhorn
 
 signoz:
+  podAnnotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "8080"
+    prometheus.io/path: /metrics
   ingress:
     enabled: false
   service:
@@ -14,6 +18,10 @@ signoz:
     signoz_alertmanager_signoz_external__url: https://signoz.home.arpa
 
 clickhouse:
+  podAnnotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "9363"
+    prometheus.io/path: /metrics
   persistence:
     enabled: true
     size: 50Gi
@@ -21,9 +29,21 @@ clickhouse:
     shardsCount: 1
     replicasCount: 1
   zookeeper:
+    podAnnotations:
+      prometheus.io/scrape: "true"
+      prometheus.io/port: "9141"
+      prometheus.io/path: /metrics
     replicaCount: 1
+  clickhouseOperator:
+    podAnnotations:
+      prometheus.io/scrape: "true"
+      prometheus.io/port: "8888"
+
 
 otelCollector:
   replicaCount: 1
+  podAnnotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "8888"
   service:
     type: ClusterIP
