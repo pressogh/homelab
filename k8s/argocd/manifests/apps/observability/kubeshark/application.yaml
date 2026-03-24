@@ -20,9 +20,6 @@ spec:
     - repoURL: https://github.com/pressogh/homelab.git
       targetRevision: main
       ref: values
-    - repoURL: https://github.com/pressogh/homelab.git
-      targetRevision: main
-      path: k8s/kubeshark
   destination:
     server: https://kubernetes.default.svc
     namespace: kubeshark
