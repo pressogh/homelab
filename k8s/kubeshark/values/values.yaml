@@ -7,11 +7,9 @@ tap:
     namespace: kubeshark
   telemetry:
     enabled: false
-  persistentStorage: true
+  persistentStorage: false
   persistentStorageStatic: false
   persistentStoragePvcVolumeMode: Filesystem
-  storageClass: longhorn
-  storageLimit: 10Gi
   snapshots:
     local:
       storageClass: longhorn
