@@ -1,0 +1,29 @@
+global:
+  clusterName: talos-homelab
+  storageClass: longhorn
+
+signoz:
+  ingress:
+    enabled: false
+  service:
+    type: ClusterIP
+  persistence:
+    enabled: true
+    size: 2Gi
+  env:
+    signoz_alertmanager_signoz_external__url: https://signoz.home.arpa
+
+clickhouse:
+  persistence:
+    enabled: true
+    size: 50Gi
+  layout:
+    shardsCount: 1
+    replicasCount: 1
+  zookeeper:
+    replicaCount: 1
+
+otelCollector:
+  replicaCount: 1
+  service:
+    type: ClusterIP

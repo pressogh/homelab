@@ -1,0 +1,56 @@
+global:
+  clusterName: talos-homelab
+  storageClass: longhorn
+
+clusterName: talos-homelab
+namespace: signoz
+otelCollectorEndpoint: signoz-otel-collector.signoz.svc.cluster.local:4317
+otelInsecure: true
+
+presets:
+  otlpExporter:
+    enabled: true
+  otlphttpExporter:
+    enabled: false
+  logsCollection:
+    enabled: false
+  hostMetrics:
+    enabled: true
+  kubeletMetrics:
+    enabled: true
+  clusterMetrics:
+    enabled: true
+  k8sEvents:
+    enabled: true
+
+otelAgent:
+  hostNetwork: false
+  ports:
+    otlp:
+      enabled: false
+      hostPort: null
+    otlp-http:
+      enabled: false
+      hostPort: null
+    zipkin:
+      enabled: false
+      hostPort: null
+    metrics:
+      enabled: true
+      hostPort: null
+    zpages:
+      enabled: false
+      hostPort: null
+    health-check:
+      enabled: true
+      hostPort: null
+    pprof:
+      enabled: false
+      hostPort: null
+
+otelDeployment:
+  ports:
+    metrics:
+      enabled: true
+    health-check:
+      enabled: true
