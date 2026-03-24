@@ -1,0 +1,21 @@
+tap:
+  auth:
+    enabled: false
+  ingress:
+    enabled: false
+  release:
+    namespace: kubeshark
+  telemetry:
+    enabled: false
+  persistentStorage: true
+  persistentStorageStatic: false
+  persistentStoragePvcVolumeMode: Filesystem
+  storageClass: longhorn
+  storageLimit: 10Gi
+  snapshots:
+    local:
+      storageClass: longhorn
+      storageSize: 20Gi
+  ipv6: false
+cloudLicenseEnabled: false
+supportChatEnabled: false

@@ -1,0 +1,44 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: kubeshark
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "3"
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: observability
+  sources:
+    - repoURL: https://github.com/kubeshark/kubeshark.git
+      targetRevision: v53.1.0
+      path: helm-chart
+      helm:
+        valueFiles:
+          - $values/k8s/kubeshark/values/values.yaml
+    - repoURL: https://github.com/pressogh/homelab.git
+      targetRevision: main
+      ref: values
+    - repoURL: https://github.com/pressogh/homelab.git
+      targetRevision: main
+      path: k8s/kubeshark
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kubeshark
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
+    managedNamespaceMetadata:
+      labels:
+        expose: internal
+        pod-security.kubernetes.io/enforce: privileged
+        pod-security.kubernetes.io/enforce-version: latest
+        pod-security.kubernetes.io/warn: baseline
+        pod-security.kubernetes.io/warn-version: latest
+        pod-security.kubernetes.io/audit: baseline
+        pod-security.kubernetes.io/audit-version: latest
