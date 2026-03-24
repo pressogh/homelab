@@ -30,7 +30,8 @@ spec:
           defaultClass: true
           defaultClassReplicaCount: 3
         defaultSettings:
-          backupTarget: ""
+          backupTarget: "s3://homelab@auto/longhorn-backups/"
+          backupTargetCredentialSecret: longhorn-backup-target
           defaultReplicaCount: 3
           guaranteedInstanceManagerCpu: 12
         ingress:
