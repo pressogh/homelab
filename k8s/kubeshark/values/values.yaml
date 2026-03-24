@@ -1,6 +1,10 @@
 tap:
   auth:
     enabled: false
+  packetCapture: af_packet
+  mountBpf: false
+  serviceMesh: false
+  tls: false
   ingress:
     enabled: false
   release:
@@ -14,6 +18,11 @@ tap:
     local:
       storageClass: longhorn
       storageSize: 20Gi
+  capture:
+    raw:
+      enabled: false
+  misc:
+    trafficSampleRate: 25
   ipv6: false
 cloudLicenseEnabled: false
 supportChatEnabled: false
