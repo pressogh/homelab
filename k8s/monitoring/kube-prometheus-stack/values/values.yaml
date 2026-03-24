@@ -9,12 +9,6 @@ alertmanager:
       enabled: false
 
   alertmanagerSpec:
-    image:
-      registry: quay.io
-      repository: prometheus/alertmanager
-      tag: v0.28.1
-      pullPolicy: IfNotPresent
-
     replicas: 2
 
     retention: 120h
@@ -143,10 +137,6 @@ prometheusOperator:
       enabled: true
     patch:
       enabled: true
-      image:
-        registry: registry.k8s.io
-        repository: ingress-nginx/kube-webhook-certgen
-        tag: v1.6.3
       ttlSecondsAfterFinished: 60
 
   networkPolicy:
@@ -219,11 +209,6 @@ prometheus:
     selfMonitor: true
 
   prometheusSpec:
-    image:
-      registry: quay.io
-      repository: prometheus/prometheus
-      tag: v3.6.0
-
     replicas: 2
 
     shards: 1
