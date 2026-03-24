@@ -25,6 +25,8 @@ spec:
       server: https://kubernetes.default.svc
     - namespace: trust-manager
       server: https://kubernetes.default.svc
+    - namespace: kubeshark
+      server: https://kubernetes.default.svc
   clusterResourceWhitelist:
     - group: '*'
       kind: '*'
