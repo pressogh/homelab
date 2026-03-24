@@ -10,6 +10,23 @@ metadata:
     - resources-finalizer.argocd.argoproj.io
 spec:
   project: observability
+  ignoreDifferences:
+    - group: apps
+      kind: Deployment
+      name: signoz-clickhouse-operator
+      jsonPointers:
+        - /spec/template/spec/containers/0/resources
+        - /spec/template/spec/containers/1/resources
+    - group: apps
+      kind: StatefulSet
+      name: signoz
+      jsonPointers:
+        - /spec/persistentVolumeClaimRetentionPolicy
+    - group: apps
+      kind: StatefulSet
+      name: signoz-zookeeper
+      jsonPointers:
+        - /spec/persistentVolumeClaimRetentionPolicy
   sources:
     - repoURL: https://charts.signoz.io
       chart: signoz
