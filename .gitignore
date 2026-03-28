@@ -253,3 +253,14 @@ vault
 
 CLAUDE.md
 .claude
+
+.env
+
+# Ignore OpenCode workspace by default
+/.opencode/**/*
+/.tmp/**/*
+
+# Keep tracked Project Intelligence context files
+!/.opencode/context/
+!/.opencode/context/project-intelligence/
+!/.opencode/context/project-intelligence/*.md
