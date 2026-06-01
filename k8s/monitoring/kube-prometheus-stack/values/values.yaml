@@ -213,7 +213,18 @@ prometheus:
 
     shards: 1
 
-    retention: 10d
+    retention: 7d
+
+    scrapeInterval: 60s
+
+    # Hard memory cap (cgroup) so a Prometheus spike OOMs only its own pod,
+    # never the node. cpu request only (no cpu limit) to avoid throttling.
+    resources:
+      requests:
+        cpu: 250m
+        memory: 2Gi
+      limits:
+        memory: 2Gi
 
     walCompression: true
 

@@ -81,11 +81,12 @@ variable "controllers" {
 }
 variable "workers" {
   type = list(object({
-    vm_id = number
-    node  = string
+    vm_id  = number
+    node   = string
+    memory = number
   }))
   default     = []
-  description = "List of worker nodes with their Proxmox node names and VM ID."
+  description = "List of worker nodes with their Proxmox node names, VM ID, and dedicated memory (MiB)."
 }
 
 variable "internal_domain" {

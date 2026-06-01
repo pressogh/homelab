@@ -13,7 +13,7 @@ spec:
   source:
     repoURL: quay.io/jetstack/charts
     chart: trust-manager
-    targetRevision: v0.22.0
+    targetRevision: v0.22.1
     helm:
       valuesObject:
         crds:

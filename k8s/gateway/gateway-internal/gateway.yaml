@@ -87,19 +87,3 @@ spec:
               expose: internal
       tls:
         mode: Passthrough
-    - name: es-https-apex
-      protocol: HTTPS
-      port: 9200
-      hostname: es.home.arpa
-      allowedRoutes:
-        namespaces:
-          from: Selector
-          selector:
-            matchLabels:
-              expose: internal
-      tls:
-        mode: Terminate
-        certificateRefs:
-          - kind: Secret
-            group: ""
-            name: internal-gateway-certs

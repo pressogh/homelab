@@ -2,23 +2,24 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: cert-manager-csi-driver
+  name: kube-prometheus-stack-crds
   namespace: argocd
   annotations:
     argocd.argoproj.io/sync-wave: "-1"
   finalizers:
     - resources-finalizer.argocd.argoproj.io
 spec:
-  project: infrastructure
+  project: monitoring
   source:
-    repoURL: https://charts.jetstack.io
-    chart: cert-manager-csi-driver
-    targetRevision: v0.15.0
-    helm:
-      releaseName: cert-manager-csi-driver
+    repoURL: https://github.com/prometheus-operator/prometheus-operator
+    targetRevision: v0.91.0
+    path: example/prometheus-operator-crd
+    directory:
+      recurse: false
+      include: "*.yaml"
   destination:
     server: https://kubernetes.default.svc
-    namespace: cert-manager
+    namespace: monitoring
   syncPolicy:
     automated:
       prune: true
@@ -26,3 +27,9 @@ spec:
     syncOptions:
       - CreateNamespace=false
       - ServerSideApply=true
+    retry:
+      limit: 3
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m

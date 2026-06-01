@@ -8,7 +8,7 @@ variable "proxmox_pve_nodes" {
 
 variable "talos_version" {
   type    = string
-  default = "1.11.1"
+  default = "1.13.3"
   validation {
     condition     = can(regex("^\\d+(\\.\\d+)+", var.talos_version))
     error_message = "Must be a version number."
@@ -16,13 +16,13 @@ variable "talos_version" {
 }
 variable "talos_disk_image_schematic_id" {
   type        = string
-  default     = "88d1f7a5c4f1d3aba7df787c448c1d3d008ed29cfb34af53fa0df4336a56040b" # 1.11.1
+  default     = "88d1f7a5c4f1d3aba7df787c448c1d3d008ed29cfb34af53fa0df4336a56040b" # schematic is content-hash of extension set; version-independent (verify on factory.talos.dev for v1.13.3)
   description = "The schematic ID of the Talos disk image to use."
 }
 
 variable "kubernetes_version" {
   type        = string
-  default     = "1.34.1"
+  default     = "1.36.1"
   description = "The version of Kubernetes to use."
   validation {
     condition     = can(regex("^\\d+(\\.\\d+)+", var.kubernetes_version))
@@ -81,16 +81,17 @@ variable "controllers" {
 }
 variable "workers" {
   type = list(object({
-    vm_id = number
-    node  = string
+    vm_id  = number
+    node   = string
+    memory = number
   }))
   default     = []
-  description = "List of worker nodes with their Proxmox node names and VM ID."
+  description = "List of worker nodes with their Proxmox node names, VM ID, and dedicated memory (MiB)."
 }
 
 variable "cilium_version" {
   type        = string
-  default     = "1.18.2"
+  default     = "1.19.4"
   description = "The version of Cilium to use."
   validation {
     condition     = can(regex("^\\d+(\\.\\d+)+", var.cilium_version))

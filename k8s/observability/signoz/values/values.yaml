@@ -28,12 +28,24 @@ clickhouse:
   layout:
     shardsCount: 1
     replicasCount: 1
+  resources:
+    requests:
+      cpu: 500m
+      memory: 3Gi
+    limits:
+      memory: 3Gi
   zookeeper:
     podAnnotations:
       prometheus.io/scrape: "true"
       prometheus.io/port: "9141"
       prometheus.io/path: /metrics
     replicaCount: 1
+    resources:
+      requests:
+        cpu: 100m
+        memory: 768Mi
+      limits:
+        memory: 768Mi
   clickhouseOperator:
     podAnnotations:
       prometheus.io/scrape: "true"
@@ -42,6 +54,12 @@ clickhouse:
 
 otelCollector:
   replicaCount: 1
+  resources:
+    requests:
+      cpu: 200m
+      memory: 512Mi
+    limits:
+      memory: 512Mi
   podAnnotations:
     prometheus.io/scrape: "true"
     prometheus.io/port: "8888"

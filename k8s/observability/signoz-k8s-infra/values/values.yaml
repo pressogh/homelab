@@ -22,7 +22,6 @@ presets:
       namespaces:
         - argocd
         - cert-manager
-        - elastic-system
         - external-secrets
         - gateway-internal
         - gateway-public

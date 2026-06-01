@@ -1,6 +1,6 @@
 locals {
   gateway_api_crd_url    = "https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.3.0/experimental-install.yaml"
-  servicemonitor_crd_url = "https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/refs/tags/v0.85.0/example/prometheus-operator-crd/monitoring.coreos.com_servicemonitors.yaml"
+  servicemonitor_crd_url = "https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/refs/tags/v0.91.0/example/prometheus-operator-crd/monitoring.coreos.com_servicemonitors.yaml"
 }
 data "http" "gateway_api_crds" {
   url = local.gateway_api_crd_url

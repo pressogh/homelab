@@ -30,3 +30,4 @@ spec:
     - https://prometheus-community.github.io/helm-charts
     - https://github.com/pressogh/homelab.git
     - https://github.com/grafana/helm-charts
+    - https://github.com/prometheus-operator/prometheus-operator

@@ -11,6 +11,7 @@ locals {
       node    = wkr.node
       address = cidrhost(var.cluster_node_network, wkr.vm_id)
       vm_id   = wkr.vm_id
+      memory  = wkr.memory
     }
   }
 

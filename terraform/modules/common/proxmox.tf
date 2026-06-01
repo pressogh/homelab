@@ -1,4 +1,4 @@
-resource "proxmox_virtual_environment_download_file" "talos" {
+resource "proxmox_download_file" "talos" {
   for_each = { for node in var.proxmox_pve_nodes : node.name => node }
 
   content_type = "iso"
@@ -57,7 +57,7 @@ resource "proxmox_virtual_environment_vm" "controller" {
     discard      = "on"
     size         = 64
     file_format  = "raw"
-    file_id      = proxmox_virtual_environment_download_file.talos[each.value.node].id
+    file_id      = proxmox_download_file.talos[each.value.node].id
   }
   agent {
     enabled = true
@@ -96,7 +96,7 @@ resource "proxmox_virtual_environment_vm" "worker" {
     cores = 4
   }
   memory {
-    dedicated = 8 * 1024
+    dedicated = each.value.memory
   }
   vga {
     type = "qxl"
@@ -121,7 +121,7 @@ resource "proxmox_virtual_environment_vm" "worker" {
     discard      = "on"
     size         = 256
     file_format  = "raw"
-    file_id      = proxmox_virtual_environment_download_file.talos[each.value.node].id
+    file_id      = proxmox_download_file.talos[each.value.node].id
   }
   agent {
     enabled = true

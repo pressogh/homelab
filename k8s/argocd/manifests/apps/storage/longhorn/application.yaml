@@ -21,7 +21,7 @@ spec:
   source:
     repoURL: https://charts.longhorn.io
     chart: longhorn
-    targetRevision: 1.11.1
+    targetRevision: 1.11.2
     helm:
       skipCrds: true
       valuesObject:
@@ -35,6 +35,9 @@ spec:
           backupTargetCredentialSecret: longhorn-backup-target
           defaultReplicaCount: 3
           guaranteedInstanceManagerCpu: 12
+          # Throttle concurrent rebuilds so node cordon/reboot does not trigger
+          # a replica-rebuild I/O storm on the pve-01 consumer NVMe (etcd contention trigger).
+          concurrentReplicaRebuildPerNodeLimit: 1
         ingress:
           enabled: false
   destination:
