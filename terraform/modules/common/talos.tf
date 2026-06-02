@@ -103,12 +103,14 @@ resource "talos_machine_configuration_apply" "controller" {
   endpoint                    = each.value.address
   node                        = each.value.address
   config_patches = [
+    # Talos 1.13 generates a `HostnameConfig` document (auto: stable) and
+    # rejects the legacy `machine.network.hostname` alongside it. Set the static
+    # hostname via HostnameConfig and disable auto generation (auto: off).
     yamlencode({
-      machine = {
-        network = {
-          hostname = each.key
-        }
-      }
+      apiVersion = "v1alpha1"
+      kind       = "HostnameConfig"
+      auto       = "off"
+      hostname   = each.key
     }),
   ]
 }
@@ -149,10 +151,16 @@ resource "talos_machine_configuration_apply" "worker" {
             }
           ]
         }
-        network = {
-          hostname = each.key
-        }
       }
+    }),
+    # Talos 1.13 generates a `HostnameConfig` document (auto: stable) and
+    # rejects the legacy `machine.network.hostname` alongside it. Set the static
+    # hostname via HostnameConfig and disable auto generation (auto: off).
+    yamlencode({
+      apiVersion = "v1alpha1"
+      kind       = "HostnameConfig"
+      auto       = "off"
+      hostname   = each.key
     }),
   ]
 }

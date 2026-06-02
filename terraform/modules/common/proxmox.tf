@@ -9,7 +9,12 @@ resource "proxmox_download_file" "talos" {
   url                     = "https://factory.talos.dev/image/${var.talos_disk_image_schematic_id}/${var.talos_version}/nocloud-amd64.raw.zst"
   decompression_algorithm = "zst"
 
-  overwrite = true
+  # With a decompressed image, the datastore file size (.iso) never matches the
+  # upstream Content-Length (.raw.zst), so overwrite=true would re-detect a size
+  # change on every plan and force replacement of the file and its dependent VMs.
+  # Disable the size check; the version-pinned file_name still triggers a fresh
+  # download when var.talos_version changes.
+  overwrite = false
 }
 
 resource "proxmox_virtual_environment_vm" "controller" {
