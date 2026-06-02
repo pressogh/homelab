@@ -10,21 +10,16 @@ metadata:
     - resources-finalizer.argocd.argoproj.io
 spec:
   project: infrastructure
-  source:
-    repoURL: quay.io/jetstack/charts
-    chart: trust-manager
-    targetRevision: v0.22.1
-    helm:
-      valuesObject:
-        crds:
-          enabled: true
-          keep: true
-        app:
-          trust:
-            namespace: cert-manager
-        secretTargets:
-          enabled: true
-          authorizedSecretsAll: true
+  sources:
+    - repoURL: quay.io/jetstack/charts
+      chart: trust-manager
+      targetRevision: v0.22.1
+      helm:
+        valueFiles:
+          - $values/k8s/trust-manager/values/values.yaml
+    - repoURL: https://github.com/pressogh/homelab.git
+      targetRevision: main
+      ref: values
   destination:
     server: https://kubernetes.default.svc
     namespace: trust-manager

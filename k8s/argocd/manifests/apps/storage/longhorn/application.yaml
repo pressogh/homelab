@@ -18,28 +18,17 @@ spec:
         - .spec
       jsonPointers:
         - /spec/conversion/webhook/clientConfig/caBundle
-  source:
-    repoURL: https://charts.longhorn.io
-    chart: longhorn
-    targetRevision: 1.11.2
-    helm:
-      skipCrds: true
-      valuesObject:
-        preUpgradeChecker:
-          jobEnabled: false
-        persistence:
-          defaultClass: true
-          defaultClassReplicaCount: 3
-        defaultSettings:
-          backupTarget: "s3://homelab@auto/longhorn-backups/"
-          backupTargetCredentialSecret: longhorn-backup-target
-          defaultReplicaCount: 3
-          guaranteedInstanceManagerCpu: 12
-          # Throttle concurrent rebuilds so node cordon/reboot does not trigger
-          # a replica-rebuild I/O storm on the pve-01 consumer NVMe (etcd contention trigger).
-          concurrentReplicaRebuildPerNodeLimit: 1
-        ingress:
-          enabled: false
+  sources:
+    - repoURL: https://charts.longhorn.io
+      chart: longhorn
+      targetRevision: 1.11.2
+      helm:
+        skipCrds: true
+        valueFiles:
+          - $values/k8s/longhorn/values/values.yaml
+    - repoURL: https://github.com/pressogh/homelab.git
+      targetRevision: main
+      ref: values
   destination:
     server: https://kubernetes.default.svc
     namespace: longhorn-system

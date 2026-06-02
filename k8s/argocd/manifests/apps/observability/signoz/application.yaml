@@ -48,13 +48,13 @@ spec:
       targetRevision: 0.126.1
       helm:
         valueFiles:
-          - $values/k8s/observability/signoz/values/values.yaml
+          - $values/k8s/signoz/values/values.yaml
     - repoURL: https://github.com/pressogh/homelab.git
       targetRevision: main
       ref: values
     - repoURL: https://github.com/pressogh/homelab.git
       targetRevision: main
-      path: k8s/observability/signoz
+      path: k8s/signoz
   destination:
     server: https://kubernetes.default.svc
     namespace: signoz

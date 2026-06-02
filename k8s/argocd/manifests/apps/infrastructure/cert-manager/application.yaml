@@ -10,24 +10,16 @@ metadata:
     - resources-finalizer.argocd.argoproj.io
 spec:
   project: infrastructure
-  source:
-    repoURL: https://charts.jetstack.io
-    chart: cert-manager
-    targetRevision: v1.20.2
-    helm:
-      valuesObject:
-        crds:
-          enabled: true
-          keep: true
-        global:
-          leaderElection:
-            namespace: cert-manager
-        prometheus:
-          enabled: true
-          servicemonitor:
-            enabled: true
-        webhook:
-          timeoutSeconds: 30
+  sources:
+    - repoURL: https://charts.jetstack.io
+      chart: cert-manager
+      targetRevision: v1.20.2
+      helm:
+        valueFiles:
+          - $values/k8s/cert-manager/values/values.yaml
+    - repoURL: https://github.com/pressogh/homelab.git
+      targetRevision: main
+      ref: values
   destination:
     server: https://kubernetes.default.svc
     namespace: cert-manager

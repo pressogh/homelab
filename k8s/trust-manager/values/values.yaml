@@ -1,0 +1,9 @@
+crds:
+  enabled: true
+  keep: true
+app:
+  trust:
+    namespace: cert-manager
+secretTargets:
+  enabled: true
+  authorizedSecretsAll: true
