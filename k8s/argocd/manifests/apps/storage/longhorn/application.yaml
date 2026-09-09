@@ -30,9 +30,10 @@ spec:
         persistence:
           defaultClass: true
           defaultClassReplicaCount: 3
-        defaultSettings:
+        defaultBackupStore:
           backupTarget: "s3://homelab@auto/longhorn-backups/"
           backupTargetCredentialSecret: longhorn-backup-target
+        defaultSettings:
           defaultReplicaCount: 3
           guaranteedInstanceManagerCpu: 12
           # Throttle concurrent rebuilds so node cordon/reboot does not trigger

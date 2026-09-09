@@ -82,7 +82,7 @@ hostNetwork: false
 webhook:
   create: true
   certCheckInterval: "5m"
-  lookaheadInterval: "720h"
+  lookaheadInterval: "168h"
   replicaCount: 1
   log:
     level: info
@@ -105,8 +105,9 @@ webhook:
       issuerRef:
         group: cert-manager.io
         kind: ClusterIssuer
-        name: internal-ca
-      duration: "8760h"
+        # The webhook trusts its own certificate through cainjector.
+        name: internal-selfsigned
+      duration: "2160h"
       revisionHistoryLimit: 0
       renewBefore: "720h"
   securityContext:
