@@ -34,15 +34,13 @@ clickhouse:
       memory: 4Gi
     limits:
       memory: 4Gi
-  # Cold start on a Longhorn volume loads system.* tables synchronously and can take
-  # longer than the chart default budget of 330s; allow up to 60 minutes.
+  # Cold start on Longhorn loads system.* log tables before /ping answers; widen
+  # the probe and load them asynchronously.
   startupProbe:
     failureThreshold: 360
   settings:
-    # Load system.* log tables after the server starts answering /ping so a
-    # cold start with thousands of system log parts does not hold readiness.
     async_load_system_database: "true"
-    # text_log at the default trace level filled 6.5GB / 2355 parts and starved merges.
+    # Default trace level fills the volume and starves merges.
     text_log/level: warning
   zookeeper:
     podAnnotations:

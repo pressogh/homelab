@@ -98,6 +98,7 @@ resource "talos_machine_configuration_apply" "controller" {
 
   for_each = local.controller_nodes
 
+  # Changes that need a reboot wait for the next reboot (talosctl upgrade) instead of rebooting on apply.
   apply_mode = "staged_if_needing_reboot"
 
   client_configuration        = talos_machine_secrets.talos.client_configuration
@@ -122,6 +123,7 @@ resource "talos_machine_configuration_apply" "worker" {
 
   for_each = local.worker_nodes
 
+  # Changes that need a reboot wait for the next reboot (talosctl upgrade) instead of rebooting on apply.
   apply_mode = "staged_if_needing_reboot"
 
   client_configuration        = talos_machine_secrets.talos.client_configuration

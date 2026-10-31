@@ -20,6 +20,7 @@ resource "proxmox_download_file" "talos" {
 resource "proxmox_virtual_environment_vm" "controller" {
   for_each = local.controller_nodes
 
+  # file_id is ForceNew; without this a Talos image bump replaces the VM.
   lifecycle {
     ignore_changes = [disk[0].file_id]
   }
@@ -88,6 +89,7 @@ resource "proxmox_virtual_environment_vm" "controller" {
 resource "proxmox_virtual_environment_vm" "worker" {
   for_each = local.worker_nodes
 
+  # file_id is ForceNew; without this a Talos image bump replaces the VM.
   lifecycle {
     ignore_changes = [disk[0].file_id]
   }

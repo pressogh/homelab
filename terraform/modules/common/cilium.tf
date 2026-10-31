@@ -136,6 +136,7 @@ data "helm_template" "cilium" {
       name  = "hubble.relay.enabled"
       value = "true"
     },
+    # Helm-generated Hubble certificates change on every plan; let a CronJob issue them in-cluster.
     {
       name  = "hubble.tls.auto.method"
       value = "cronJob"
