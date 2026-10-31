@@ -214,6 +214,7 @@ prometheus:
     shards: 1
 
     retention: 7d
+    retentionSize: 15GB
 
     scrapeInterval: 60s
 

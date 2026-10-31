@@ -31,9 +31,9 @@ clickhouse:
   resources:
     requests:
       cpu: 500m
-      memory: 3Gi
+      memory: 4Gi
     limits:
-      memory: 3Gi
+      memory: 4Gi
   # Cold start on a Longhorn volume loads system.* tables synchronously and can take
   # longer than the chart default budget of 330s; allow up to 60 minutes.
   startupProbe:
@@ -42,6 +42,8 @@ clickhouse:
     # Load system.* log tables after the server starts answering /ping so a
     # cold start with thousands of system log parts does not hold readiness.
     async_load_system_database: "true"
+    # text_log at the default trace level filled 6.5GB / 2355 parts and starved merges.
+    text_log/level: warning
   zookeeper:
     podAnnotations:
       prometheus.io/scrape: "true"
@@ -55,6 +57,12 @@ clickhouse:
       limits:
         memory: 768Mi
   clickhouseOperator:
+    traceLog:
+      ttl: 1
+    metricLog:
+      ttl: 3
+    asynchronousMetricLog:
+      ttl: 3
     podAnnotations:
       prometheus.io/scrape: "true"
       prometheus.io/port: "8888"
