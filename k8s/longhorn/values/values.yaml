@@ -11,7 +11,7 @@ defaultSettings:
   guaranteedInstanceManagerCPU: 12
   # Throttle concurrent rebuilds so node cordon/reboot does not trigger
   # a replica-rebuild I/O storm on the pve-01 consumer NVMe (etcd contention trigger).
-  concurrentReplicaRebuildPerNodeLimit: 1
+  concurrentReplicaRebuildPerNodeLimit: 2
 ingress:
   enabled: false
 networkPolicies:
