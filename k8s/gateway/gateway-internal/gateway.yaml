@@ -63,27 +63,3 @@ spec:
           - kind: Secret
             group: ""
             name: internal-gateway-certs
-    - name: https-apex-passthrough
-      protocol: TLS
-      port: 443
-      hostname: home.arpa
-      allowedRoutes:
-        namespaces:
-          from: Selector
-          selector:
-            matchLabels:
-              expose: internal
-      tls:
-        mode: Passthrough
-    - name: https-wild-passthrough
-      protocol: TLS
-      port: 443
-      hostname: "*.home.arpa"
-      allowedRoutes:
-        namespaces:
-          from: Selector
-          selector:
-            matchLabels:
-              expose: internal
-      tls:
-        mode: Passthrough
