@@ -37,7 +37,11 @@ clickhouse:
   # Cold start on a Longhorn volume loads system.* tables synchronously and can take
   # longer than the chart default budget of 330s; allow up to 30 minutes.
   startupProbe:
-    failureThreshold: 180
+    failureThreshold: 360
+  settings:
+    # Load system.* log tables after the server starts answering /ping so a
+    # cold start with thousands of system log parts does not hold readiness.
+    async_load_system_database: "true"
   zookeeper:
     podAnnotations:
       prometheus.io/scrape: "true"
