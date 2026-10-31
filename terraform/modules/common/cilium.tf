@@ -39,7 +39,7 @@ locals {
       }
     },
     {
-      apiVersion = "cilium.io/v2alpha1"
+      apiVersion = "cilium.io/v2"
       kind       = "CiliumLoadBalancerIPPool"
       metadata = {
         name = "external"
