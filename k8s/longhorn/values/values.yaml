@@ -12,6 +12,8 @@ defaultSettings:
   # Throttle concurrent rebuilds so node cordon/reboot does not trigger
   # a replica-rebuild I/O storm on the pve-01 consumer NVMe (etcd contention trigger).
   concurrentReplicaRebuildPerNodeLimit: 1
+  # Live-upgrade engines after a chart bump; the default 0 leaves volumes on the old engine.
+  concurrentAutomaticEngineUpgradePerNodeLimit: 1
 ingress:
   enabled: false
 networkPolicies:
