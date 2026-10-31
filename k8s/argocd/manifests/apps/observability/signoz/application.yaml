@@ -18,7 +18,6 @@ spec:
         - /spec/template/spec/containers/0/resources
         - /spec/template/spec/containers/1/resources
         - /spec/template/spec/dnsPolicy
-        - /spec/template/spec/priorityClassName
         - /spec/template/spec/restartPolicy
         - /spec/template/spec/schedulerName
         - /spec/template/spec/serviceAccount
@@ -31,10 +30,8 @@ spec:
       jsonPointers:
         - /spec/volumeClaimTemplates/0/apiVersion
         - /spec/volumeClaimTemplates/0/kind
-        - /spec/template/spec/containers/0/args
         - /spec/template/spec/dnsPolicy
         - /spec/persistentVolumeClaimRetentionPolicy
-        - /spec/template/spec/priorityClassName
         - /spec/template/spec/restartPolicy
         - /spec/template/spec/schedulerName
         - /spec/template/spec/serviceAccount
@@ -45,11 +42,7 @@ spec:
       jsonPointers:
         - /spec/volumeClaimTemplates/0/apiVersion
         - /spec/volumeClaimTemplates/0/kind
-        - /spec/template/spec/affinity/nodeAffinity
-        - /spec/template/spec/affinity/podAffinity
-        - /spec/template/spec/containers/0/env/1/value
         - /spec/template/spec/dnsPolicy
-        - /spec/template/spec/initContainers
         - /spec/persistentVolumeClaimRetentionPolicy
         - /spec/template/spec/restartPolicy
         - /spec/template/spec/schedulerName
