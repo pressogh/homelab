@@ -20,3 +20,7 @@ output "controllers" {
 output "workers" {
   value = join(",", [for node in local.worker_nodes : node.address])
 }
+
+output "cilium_manifest" {
+  value = local.cilium_manifest
+}

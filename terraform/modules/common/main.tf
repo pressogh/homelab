@@ -8,15 +8,19 @@ locals {
   }
   worker_nodes = {
     for i, wkr in var.workers : "worker-0${i + 1}" => {
-      node    = wkr.node
-      address = cidrhost(var.cluster_node_network, wkr.vm_id)
-      vm_id   = wkr.vm_id
-      memory  = wkr.memory
+      node              = wkr.node
+      address           = cidrhost(var.cluster_node_network, wkr.vm_id)
+      vm_id             = wkr.vm_id
+      memory            = wkr.memory
+      disk_datastore_id = wkr.disk_datastore_id
     }
   }
 
   common_machine_config = {
     machine = {
+      install = {
+        image = "factory.talos.dev/nocloud-installer/${var.talos_disk_image_schematic_id}:v${var.talos_version}"
+      }
       features = {
         kubePrism = {
           enabled = true

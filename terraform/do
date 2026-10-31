@@ -123,6 +123,12 @@ function destroy {
   tofu destroy -auto-approve
 }
 
+function apply-cilium {
+  step 'apply cilium manifest'
+  # Talos only creates inline manifests once; Cilium and CRD upgrades are applied here.
+  tofu output -raw cilium_manifest | kubectl apply --server-side --force-conflicts -f -
+}
+
 function merge-kubeconfig {
   step 'merge kubeconfig to ~/.kube/config'
 
@@ -164,11 +170,14 @@ case $1 in
   destroy)
     destroy
     ;;
+  apply-cilium)
+    apply-cilium
+    ;;
   merge-kubeconfig)
     merge-kubeconfig
     ;;
   *)
-    echo $"Usage: $0 {init|plan|apply|plan-apply|health|info}"
+    echo $"Usage: $0 {init|plan|apply|plan-apply|health|info|apply-cilium|destroy|merge-kubeconfig}"
     exit 1
     ;;
 esac

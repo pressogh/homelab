@@ -81,9 +81,10 @@ variable "controllers" {
 }
 variable "workers" {
   type = list(object({
-    vm_id  = number
-    node   = string
-    memory = number
+    vm_id             = number
+    node              = string
+    memory            = number
+    disk_datastore_id = optional(string, "local-lvm")
   }))
   default     = []
   description = "List of worker nodes with their Proxmox node names, VM ID, and dedicated memory (MiB)."

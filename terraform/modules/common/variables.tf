@@ -8,7 +8,7 @@ variable "proxmox_pve_nodes" {
 
 variable "talos_version" {
   type    = string
-  default = "1.13.3"
+  default = "1.14.5"
   validation {
     condition     = can(regex("^\\d+(\\.\\d+)+", var.talos_version))
     error_message = "Must be a version number."
@@ -16,13 +16,19 @@ variable "talos_version" {
 }
 variable "talos_disk_image_schematic_id" {
   type        = string
-  default     = "88d1f7a5c4f1d3aba7df787c448c1d3d008ed29cfb34af53fa0df4336a56040b" # schematic is content-hash of extension set; version-independent (verify on factory.talos.dev for v1.13.3)
+  default     = "88d1f7a5c4f1d3aba7df787c448c1d3d008ed29cfb34af53fa0df4336a56040b" # Content-addressed customization; independent of the Talos version.
   description = "The schematic ID of the Talos disk image to use."
+}
+
+variable "talos_config_version" {
+  type        = string
+  default     = "1.13.3"
+  description = "Machine configuration version contract. Keep at the version the cluster was created with; Talos upgrades do not require bumping it. A 1.14 contract generates multi-document config and rejects the v1alpha1 patches in main.tf and talos.tf."
 }
 
 variable "kubernetes_version" {
   type        = string
-  default     = "1.36.1"
+  default     = "1.37.2"
   description = "The version of Kubernetes to use."
   validation {
     condition     = can(regex("^\\d+(\\.\\d+)+", var.kubernetes_version))
@@ -81,9 +87,10 @@ variable "controllers" {
 }
 variable "workers" {
   type = list(object({
-    vm_id  = number
-    node   = string
-    memory = number
+    vm_id             = number
+    node              = string
+    memory            = number
+    disk_datastore_id = optional(string, "local-lvm")
   }))
   default     = []
   description = "List of worker nodes with their Proxmox node names, VM ID, and dedicated memory (MiB)."

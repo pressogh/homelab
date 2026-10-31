@@ -13,7 +13,7 @@ spec:
   sources:
     - repoURL: https://charts.signoz.io
       chart: k8s-infra
-      targetRevision: 0.16.0
+      targetRevision: 0.17.1
       helm:
         valueFiles:
           - $values/k8s/signoz-k8s-infra/values/values.yaml

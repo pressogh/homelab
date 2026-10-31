@@ -1,5 +1,5 @@
 resource "talos_machine_secrets" "talos" {
-  talos_version = "v${var.talos_version}"
+  talos_version = "v${var.talos_config_version}"
 }
 
 data "talos_machine_configuration" "controller" {
@@ -7,7 +7,7 @@ data "talos_machine_configuration" "controller" {
   cluster_endpoint   = var.cluster_endpoint
   machine_secrets    = talos_machine_secrets.talos.machine_secrets
   machine_type       = "controlplane"
-  talos_version      = "v${var.talos_version}"
+  talos_version      = "v${var.talos_config_version}"
   kubernetes_version = var.kubernetes_version
   examples           = false
   docs               = false
@@ -78,7 +78,7 @@ data "talos_machine_configuration" "worker" {
   cluster_endpoint   = var.cluster_endpoint
   machine_secrets    = talos_machine_secrets.talos.machine_secrets
   machine_type       = "worker"
-  talos_version      = "v${var.talos_version}"
+  talos_version      = "v${var.talos_config_version}"
   kubernetes_version = var.kubernetes_version
   examples           = false
   docs               = false
@@ -97,6 +97,8 @@ resource "talos_machine_configuration_apply" "controller" {
   depends_on = [proxmox_virtual_environment_vm.controller]
 
   for_each = local.controller_nodes
+
+  apply_mode = "staged_if_needing_reboot"
 
   client_configuration        = talos_machine_secrets.talos.client_configuration
   machine_configuration_input = data.talos_machine_configuration.controller.machine_configuration
@@ -120,6 +122,8 @@ resource "talos_machine_configuration_apply" "worker" {
 
   for_each = local.worker_nodes
 
+  apply_mode = "staged_if_needing_reboot"
+
   client_configuration        = talos_machine_secrets.talos.client_configuration
   machine_configuration_input = data.talos_machine_configuration.worker.machine_configuration
   endpoint                    = each.value.address
@@ -129,7 +133,7 @@ resource "talos_machine_configuration_apply" "worker" {
       machine = {
         sysctls = {
           "vm.max_map_count" = 262144
-          "vm.nr_hugepages"  = 1024
+          "vm.nr_hugepages"  = 0
         }
         kernel = {
           modules = [

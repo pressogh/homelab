@@ -15,3 +15,6 @@ output "controllers" {
 output "workers" {
   value = module.common.workers
 }
+output "cilium_manifest" {
+  value = module.common.cilium_manifest
+}

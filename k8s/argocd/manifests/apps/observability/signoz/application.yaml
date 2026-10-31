@@ -45,7 +45,7 @@ spec:
   sources:
     - repoURL: https://charts.signoz.io
       chart: signoz
-      targetRevision: 0.126.1
+      targetRevision: 0.131.0
       helm:
         valueFiles:
           - $values/k8s/signoz/values/values.yaml

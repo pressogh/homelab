@@ -16,10 +16,10 @@ jobs:
     name: Validate tofu configuration
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: tofu validate
-        uses: dflook/tofu-validate@v2
+        uses: dflook/tofu-validate@v3
         with:
           path: terraform
 
@@ -28,9 +28,9 @@ jobs:
     name: Check formatting of tofu files
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: tofu fmt
-        uses: dflook/tofu-fmt-check@v2
+        uses: dflook/tofu-fmt-check@v3
         with:
           path: terraform

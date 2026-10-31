@@ -8,9 +8,14 @@ defaultBackupStore:
   backupTargetCredentialSecret: longhorn-backup-target
 defaultSettings:
   defaultReplicaCount: 3
-  guaranteedInstanceManagerCpu: 12
+  guaranteedInstanceManagerCPU: 12
   # Throttle concurrent rebuilds so node cordon/reboot does not trigger
   # a replica-rebuild I/O storm on the pve-01 consumer NVMe (etcd contention trigger).
   concurrentReplicaRebuildPerNodeLimit: 1
 ingress:
   enabled: false
+networkPolicies:
+  # 1.12.1 enables internal NetworkPolicies by default; with Cilium they block the
+  # host iSCSI initiator (port 3260). Keep them off until 1.13's
+  # v1DataEngineInitiatorSourceCIDRs is in place.
+  restrictInternalTraffic: false

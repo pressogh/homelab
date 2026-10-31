@@ -19,6 +19,9 @@ resource "helm_release" "argocd" {
   values = [yamlencode({
     global = {
       domain = var.argocd_domain
+      networkPolicy = {
+        create = false
+      }
     }
     server = {
       ingress = {

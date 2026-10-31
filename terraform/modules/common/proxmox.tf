@@ -20,6 +20,10 @@ resource "proxmox_download_file" "talos" {
 resource "proxmox_virtual_environment_vm" "controller" {
   for_each = local.controller_nodes
 
+  lifecycle {
+    ignore_changes = [disk[0].file_id]
+  }
+
   name            = "talos-${var.cluster_name}-${each.key}"
   node_name       = each.value.node
   tags            = sort(["terraform", "talos", "control-plane", var.cluster_name])
@@ -84,6 +88,10 @@ resource "proxmox_virtual_environment_vm" "controller" {
 resource "proxmox_virtual_environment_vm" "worker" {
   for_each = local.worker_nodes
 
+  lifecycle {
+    ignore_changes = [disk[0].file_id]
+  }
+
   name            = "talos-${var.cluster_name}-${each.key}"
   node_name       = each.value.node
   tags            = sort(["terraform", "talos", "worker", var.cluster_name])
@@ -119,7 +127,7 @@ resource "proxmox_virtual_environment_vm" "worker" {
     type         = "4m"
   }
   disk {
-    datastore_id = "local-lvm"
+    datastore_id = each.value.disk_datastore_id
     interface    = "scsi0"
     iothread     = true
     ssd          = true

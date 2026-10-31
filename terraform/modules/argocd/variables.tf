@@ -1,6 +1,6 @@
 variable "argocd_version" {
   type        = string
-  default     = "8.5.7"
+  default     = "10.11.6"
   description = "The version of Argo CD to use."
   validation {
     condition     = can(regex("^\\d+(\\.\\d+)+", var.argocd_version))
